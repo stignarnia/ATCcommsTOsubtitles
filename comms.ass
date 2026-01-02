@@ -1,0 +1,28 @@
+[Script Info]
+Title: Comms Subtitles
+ScriptType: v4.00+
+WrapStyle: 0
+PlayResX: 1920
+PlayResY: 1080
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Arial,56,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,1,10,10,10,1
+Style: T,Arial,56,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,1,20,20,20,1
+Style: APP,Arial,56,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,1,20,20,20,1
+Style: TWR,Arial,56,&H000000FF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,1,20,20,20,1
+Style: GND,Arial,56,&H00FF00FF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,1,20,20,20,1
+Style: LH,Arial,56,&H00FF0000,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,3,20,20,20,1
+Style: TPY,Arial,56,&H00008000,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,3,20,20,20,1
+Style: JET,Arial,56,&H00FFFF00,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,3,20,20,20,1
+Style: EZS,Arial,56,&H0000A5FF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,3,20,20,20,1
+Style: TPT,Arial,56,&H0000FFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,3,20,20,20,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:00.000,0:00:01.550,APP,Lisboa Approach,0,0,0,,Lisboa Approach, good morning.
+Dialogue: 0,0:00:01.550,0:00:06.900,LH,DLH97V,0,0,0,,Good morning, Lisboa Approach, DLH97V with you, level FL350.
+Dialogue: 0,0:00:06.900,0:00:11.950,APP,Lisboa Approach,0,0,0,,DLH97V, Lisboa Approach, radar contact. Descend to FL150.
+Dialogue: 0,0:00:30.000,0:00:33.450,LH,DLH97V,0,0,0,,Descend to FL150, DLH97V.
+Dialogue: 0,0:00:33.450,0:00:36.550,APP,Lisboa Approach,0,0,0,,DLH97V, turn left heading 240.
+Dialogue: 0,0:00:36.550,0:00:39.400,LH,DLH97V,0,0,0,,Left heading 240, DLH97V.
