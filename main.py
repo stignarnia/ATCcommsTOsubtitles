@@ -92,6 +92,9 @@ def parse_ini_non_comms(path: str) -> configparser.ConfigParser:
     We can't directly use ConfigParser on the whole file because [comms]
     contains repeated keys (APP=..., APP=...) which triggers DuplicateOptionError
     when strict=True. So we manually strip out the [comms] section first.
+
+    Also exclude any [waypoints.*] sections from the ConfigParser input since
+    they contain freeform tokens (one per line) rather than key=value pairs.
     """
     kept_lines = []
     in_comms = False
@@ -100,7 +103,8 @@ def parse_ini_non_comms(path: str) -> configparser.ConfigParser:
             line = raw.strip()
             if line.startswith("[") and line.endswith("]"):
                 section = line[1:-1].strip().lower()
-                in_comms = (section == "comms")
+                # Exclude both [comms] and [waypoints.*] from the ConfigParser input
+                in_comms = (section == "comms" or section.startswith("waypoints."))
                 if not in_comms:
                     kept_lines.append(raw)
                 continue
@@ -177,7 +181,36 @@ def _load_acronyms(config: configparser.ConfigParser) -> dict[str, str]:
             acr[key] = ext
     return acr
 
-def estimate_spoken_length(text: str, acronyms: dict[str, str] | None = None) -> int:
+def _load_waypoints(path: str) -> dict[str, set[str]]:
+    """
+    Load [waypoints.*] sections where each non-empty non-comment line is a waypoint token.
+    Returns e.g. {"RNAV": {"LAZET", "RULOX"}} with tokens preserved as written.
+    """
+    waypoints = {}
+    in_section = False
+    current = None
+    with open(path, "r", encoding="utf-8") as f:
+        for raw in f:
+            line = raw.strip()
+            if not line or line.startswith(";") or line.startswith("#"):
+                continue
+            if line.startswith("[") and line.endswith("]"):
+                sec = line[1:-1].strip()
+                if sec.lower().startswith("waypoints."):
+                    in_section = True
+                    current = sec.split(".", 1)[1].strip().upper()
+                    waypoints[current] = set()
+                else:
+                    in_section = False
+                    current = None
+                continue
+            if in_section and current:
+                parts = [p.strip() for p in line.split(",") if p.strip()]
+                for p in parts:
+                    waypoints[current].add(p)
+    return waypoints
+
+def estimate_spoken_length(text: str, acronyms: dict[str, str] | None = None, waypoints: set[str] | None = None) -> int:
     """
     Estimate "spoken character length" (unitless) based on:
       - acronym expansions from [acronyms.*] computed FIRST (e.g. "FL350" -> "Flight Level 350")
@@ -187,8 +220,12 @@ def estimate_spoken_length(text: str, acronyms: dict[str, str] | None = None) ->
       - otherwise count characters as-is
 
     This is a heuristic used for duration estimation (cps).
+
+    The `waypoints` set (uppercase tokens) disables NATO expansion for matching tokens so
+    RNAV waypoints are spoken literally.
     """
     acronyms = acronyms or {}
+    waypoints = set(w.upper() for w in (waypoints or set()))
 
     total = 0
     for token in text.split():
@@ -208,10 +245,10 @@ def estimate_spoken_length(text: str, acronyms: dict[str, str] | None = None) ->
 
         if prefix and prefix in acronyms:
             # Speak the expansion (normal words) + then process the suffix (often digits).
-            total += estimate_spoken_length(acronyms[prefix], acronyms={})
+            total += estimate_spoken_length(acronyms[prefix], acronyms={}, waypoints=waypoints)
             if suffix:
                 total += 1  # word boundary
-                total += estimate_spoken_length(suffix, acronyms={})
+                total += estimate_spoken_length(suffix, acronyms={}, waypoints=waypoints)
             total += 1  # space boundary after token
             continue
 
@@ -229,7 +266,8 @@ def estimate_spoken_length(text: str, acronyms: dict[str, str] | None = None) ->
             and any(ch.isalpha() for ch in stripped)
         )
 
-        if is_all_caps_token:
+        # If this token is a declared waypoint, treat it literally (no NATO expansion).
+        if is_all_caps_token and stripped.upper() not in waypoints:
             for ch in stripped:
                 if ch.isdigit():
                     total += _DIGIT_WORD_LEN.get(ch, 1) + 1  # + space
@@ -250,13 +288,13 @@ def estimate_spoken_length(text: str, acronyms: dict[str, str] | None = None) ->
     return max(0, total)
 
 def estimate_duration(
-    text: str, cps: float = 15.0, acronyms: dict[str, str] | None = None
+    text: str, cps: float = 15.0, acronyms: dict[str, str] | None = None, waypoints: set[str] | None = None
 ) -> timedelta:
     """
     Estimate speaking duration using characters-per-second.
     No minimum.
     """
-    spoken_len = estimate_spoken_length(text, acronyms=acronyms)
+    spoken_len = estimate_spoken_length(text, acronyms=acronyms, waypoints=waypoints)
     seconds = spoken_len / max(0.001, cps)
     return timedelta(milliseconds=int(seconds * 1000))
 
@@ -337,6 +375,12 @@ def main() -> None:
     types = {s.split('.')[-1]: dict(config.items(s)) for s in config.sections() if s.startswith('types.')}
     speakers = {s.split('.')[-1]: dict(config.items(s)) for s in config.sections() if s.startswith('speakers.')}
     acronyms = _load_acronyms(config)
+    # Load declared waypoints (e.g. [waypoints.RNAV]) so they are spoken literally, not as NATO.
+    waypoints = _load_waypoints('comms.ini')
+    # Flatten all waypoint tokens into a set of uppercased tokens for quick membership checks.
+    literal_waypoints = set()
+    for s in waypoints.values():
+        literal_waypoints.update(w.upper() for w in s)
     
     # Use stable ASS style names (speaker keys), not display names that may contain spaces.
     for speaker_key in speakers:
@@ -420,7 +464,7 @@ def main() -> None:
             continue
 
         # Estimate per-line durations (smart), then clamp to fit before next T.
-        est = [estimate_duration(mval, cps=speech_cps, acronyms=acronyms) for _, mval in block_msgs]
+        est = [estimate_duration(mval, cps=speech_cps, acronyms=acronyms, waypoints=literal_waypoints) for _, mval in block_msgs]
 
         if block_end is None or block_end <= block_start:
             # No max bound: just use estimated durations, but ensure monotonic progress
