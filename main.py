@@ -48,10 +48,22 @@ def format_time(td: timedelta) -> str:
     return f"{hours:01d}:{minutes:02d}:{seconds:02d}.{milliseconds:03d}"
 
 def get_speaker_style(
-    speaker_key: str, speakers: dict[str, dict[str, str]], types: dict[str, dict[str, str]]
+    speaker_key: str,
+    speakers: dict[str, dict[str, str]],
+    types: dict[str, dict[str, str]],
+    meta: dict[str, dict[str, str]] | None = None,
 ) -> dict[str, str]:
-    """Get effective style attributes for a speaker (type defaults + speaker overrides)."""
-    speaker_info = speakers.get(speaker_key, {})
+    """Get effective style attributes for a speaker (type defaults + speaker overrides).
+    Supports "meta" mappings (e.g. C -> Comment) for non-speaker keys declared under [meta.*]."""
+    meta = meta or {}
+    # Prefer explicit speaker entry if present
+    speaker_info = speakers.get(speaker_key)
+    if not speaker_info and speaker_key in meta:
+        # Synthesize minimal speaker_info from meta mapping (meta.* sections may only declare type/name).
+        m = meta[speaker_key]
+        speaker_info = {"name": m.get("name", speaker_key), "type": m.get("type")}
+
+    speaker_info = speaker_info or {}
     speaker_type = speaker_info.get("type")
     type_info = types.get(speaker_type, {})
 
@@ -82,8 +94,24 @@ def parse_comms_lines(path: str) -> list[tuple[str, str]]:
             if "=" not in line:
                 continue
             k, v = line.split("=", 1)
-            lines.append((k.strip().upper(), v.strip()))
+            k = k.strip().upper()
+            v = v.strip()
+            # If the value is wrapped in quotes (to allow apostrophes), remove the outer quotes.
+            if len(v) >= 2 and ((v[0] == '"' and v[-1] == '"') or (v[0] == "'" and v[-1] == "'")):
+                v = v[1:-1]
+            # Unescape any escaped quotes inside the value.
+            v = v.replace('\\"', '"').replace("\\'", "'")
+            lines.append((k, v))
     return lines
+
+def strip_outer_quotes(s: str) -> str:
+    """Remove surrounding quotes if present and unescape internal escaped quotes."""
+    if not s:
+        return s
+    s = s.strip()
+    if len(s) >= 2 and ((s[0] == '"' and s[-1] == '"') or (s[0] == "'" and s[-1] == "'")):
+        s = s[1:-1]
+    return s.replace('\\"', '"').replace("\\'", "'")
 
 def parse_ini_non_comms(path: str) -> configparser.ConfigParser:
     """
@@ -372,8 +400,18 @@ def main() -> None:
     # Default Style
     ass_file.append("Style: Default,Arial,56,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,1,10,10,10,1")
 
-    types = {s.split('.')[-1]: dict(config.items(s)) for s in config.sections() if s.startswith('types.')}
+    # Collect type definitions. Use the new "metaTypes." and "speakerTypes."".
+    types = {}
+    for s in config.sections():
+        if s.startswith("metaTypes.") or s.startswith("speakerTypes."):
+            types[s.split(".", 1)[1].strip()] = dict(config.items(s))
+
+    # Speakers remain under [speakers.*]
     speakers = {s.split('.')[-1]: dict(config.items(s)) for s in config.sections() if s.startswith('speakers.')}
+
+    # Meta mappings (short tags used in [comms], e.g. [meta.T] or [meta.C])
+    meta = {s.split('.')[-1]: dict(config.items(s)) for s in config.sections() if s.startswith('meta.')}
+
     acronyms = _load_acronyms(config)
     # Load declared waypoints (e.g. [waypoints.RNAV]) so they are spoken literally, not as NATO.
     waypoints = _load_waypoints('comms.ini')
@@ -382,9 +420,10 @@ def main() -> None:
     for s in waypoints.values():
         literal_waypoints.update(w.upper() for w in s)
     
-    # Use stable ASS style names (speaker keys), not display names that may contain spaces.
-    for speaker_key in speakers:
-        style = get_speaker_style(speaker_key, speakers, types)
+    # Use stable ASS style names (speaker keys and meta keys), not display names that may contain spaces.
+    style_keys = list(speakers.keys()) + [k for k in meta.keys() if k != "T"]
+    for speaker_key in style_keys:
+        style = get_speaker_style(speaker_key, speakers, types, meta)
 
         color = ass_color(style["color"])
 
@@ -411,8 +450,10 @@ def main() -> None:
     fallback_duration = timedelta(milliseconds=1)
 
     # Timestamp format from INI is used only for interpreting T tags.
-    t_fmt = types.get("Timestamp", {}).get("format", "mm:ss")
-    speech_cps = float(types.get("Timestamp", {}).get("cps", "15"))
+    # The timestamp tag (e.g. meta key "T") can remap which type provides format/cps via [meta.T] -> type name.
+    timestamp_type_name = meta.get("T", {}).get("type", "Timestamp")
+    t_fmt = types.get(timestamp_type_name, {}).get("format", "mm:ss")
+    speech_cps = float(types.get(timestamp_type_name, {}).get("cps", "15"))
 
     # First pass: collect all explicit T markers (index + time)
     markers: list[tuple[int, timedelta]] = []
@@ -428,7 +469,7 @@ def main() -> None:
         return None
 
     # Validate comms speaker keys early (ignore T markers).
-    known_speakers = set(speakers.keys())
+    known_speakers = set(speakers.keys()) | (set(meta.keys()) - {"T"})
     for idx, (k, _v) in enumerate(comms_lines):
         if k != "T" and k not in known_speakers:
             raise ValueError(f"Unknown speaker key {k!r} in [comms] at index {idx}")
@@ -472,8 +513,9 @@ def main() -> None:
                 start_time = current_time
                 end_time = start_time + (dur if dur.total_seconds() > 0 else fallback_duration)
 
+                text_val = strip_outer_quotes(mval)
                 ass_file.append(
-                    f"Dialogue: 0,{format_time(start_time)},{format_time(end_time)},{mkey},{escape_ass_text(get_speaker_style(mkey, speakers, types)['display_name'])},0,0,0,,{escape_ass_text(mval)}"
+                    f"Dialogue: 0,{format_time(start_time)},{format_time(end_time)},{mkey},{escape_ass_text(get_speaker_style(mkey, speakers, types, meta)['display_name'])},0,0,0,,{escape_ass_text(text_val)}"
                 )
                 current_time = end_time
         else:
@@ -504,8 +546,9 @@ def main() -> None:
                 start_time = current_time
                 end_time = start_time + timedelta(milliseconds=dur_ms)
 
+                text_val = strip_outer_quotes(mval)
                 ass_file.append(
-                    f"Dialogue: 0,{format_time(start_time)},{format_time(end_time)},{mkey},{escape_ass_text(get_speaker_style(mkey, speakers, types)['display_name'])},0,0,0,,{escape_ass_text(mval)}"
+                    f"Dialogue: 0,{format_time(start_time)},{format_time(end_time)},{mkey},{escape_ass_text(get_speaker_style(mkey, speakers, types, meta)['display_name'])},0,0,0,,{escape_ass_text(text_val)}"
                 )
                 current_time = end_time
 
