@@ -636,6 +636,7 @@ extension = Flight Level
 LAZET
 
 ; Comms
+; Special characters like the ' in don't should be escaped by wrapping the string in double quotes ("). These will not be rendered in the subtitles
 [comms]
 T = 00:00
 C = Time: 18:50 UTC on December 30, 2025, ATIS K in effect, QNH 1020 hPa

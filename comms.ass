@@ -59,3 +59,11 @@ Dialogue: 0,0:15:50.000,0:16:11.500,C,C,0,0,0,,We override the simulation to put
 Dialogue: 0,0:16:11.500,0:16:18.850,TPY,TAP43RY,0,0,0,,Lisboa Arrival boa tarde, TAP43RY, FL390, inbound to INBOM, Information K
 Dialogue: 0,0:16:18.850,0:16:31.850,APP,Lisboa Approach,0,0,0,,TAP43RY, Lisboa Arrival boa tarde, identified. When ready descend FL80. Cleared INBOM arrival, expect ILS runway 02. Information K is now current, QNH 1020
 Dialogue: 0,0:16:31.850,0:16:41.350,TPY,TAP43RY,0,0,0,,When ready descend FL80, cleared INBOM arrival, expect ILS runway 02, QNH 1020, TAP43RY
+Dialogue: 0,0:16:45.000,0:17:07.000,C,C,0,0,0,,In the simulation I clear Lufthansa and TAP43RY to FL80 only now, this is because, since I told them to descend when ready, we assume they decided this is their calculated top of descent. This was the only way to make the simulation understand this. The simulation will now make them descend at 1600 fpm but in reality they would use a managed descent and be at FL80 at MAZUK
+Dialogue: 0,0:17:07.000,0:17:21.750,C,C,0,0,0,,In the simulation you see TAP43RY reaching INBOM and continuing on heading 219. This is wrong. In reality, we cleared them for the INBOM arrival so they would turn towards the next waypoint after INBOM which is PT808
+Dialogue: 0,0:17:58.000,0:18:00.600,APP,Lisboa Approach,0,0,0,,DLH97V, proceed direct NATID
+Dialogue: 0,0:18:00.600,0:18:02.850,LH,DLH97V,0,0,0,,Direct NATID, DLH97V
+Dialogue: 0,0:18:02.850,0:18:06.700,APP,Lisboa Approach,0,0,0,,TAP43RY, proceed direct ODLIX
+Dialogue: 0,0:18:06.700,0:18:10.200,TPY,TAP43RY,0,0,0,,Direct ODLIX, TAP43RY
+Dialogue: 0,0:18:20.000,0:18:24.150,APP,Lisboa Approach,0,0,0,,N178QS, cleared ILS approach runway 02
+Dialogue: 0,0:18:24.150,0:18:28.350,JET,N178QS,0,0,0,,Cleared ILS approach runway 02, N178QS
