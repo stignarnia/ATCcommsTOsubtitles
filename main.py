@@ -4,7 +4,6 @@ import os
 from datetime import timedelta
 import webcolors
 
-
 def escape_ass_text(text: str) -> str:
     """Escape text for ASS Dialogue lines (minimal escaping)."""
     # Curly braces start override blocks in ASS.
@@ -320,7 +319,12 @@ def estimate_spoken_length(text: str, acronyms: dict[str, str] | None = None, wa
             continue
 
         # Normal token: expand digits only
-        for ch in token:
+        # Treat any dot between two digits as the spoken word "decimal".
+        for idx, ch in enumerate(token):
+            # Handle dot between two digits as "decimal"
+            if ch == "." and idx > 0 and idx < len(token) - 1 and token[idx - 1].isdigit() and token[idx + 1].isdigit():
+                total += len("decimal")
+                continue
             if ch.isdigit():
                 total += _DIGIT_WORD_LEN.get(ch, 1)
             else:

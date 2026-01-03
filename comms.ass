@@ -67,3 +67,6 @@ Dialogue: 0,0:18:02.850,0:18:06.700,APP,Lisboa Approach,0,0,0,,TAP43RY, proceed 
 Dialogue: 0,0:18:06.700,0:18:10.200,TPY,TAP43RY,0,0,0,,Direct ODLIX, TAP43RY
 Dialogue: 0,0:18:20.000,0:18:24.150,APP,Lisboa Approach,0,0,0,,N178QS, cleared ILS approach runway 02
 Dialogue: 0,0:18:24.150,0:18:28.350,JET,N178QS,0,0,0,,Cleared ILS approach runway 02, N178QS
+Dialogue: 0,0:19:45.000,0:19:49.500,APP,Lisboa Approach,0,0,0,,N178QS, contact Lisboa Tower 118.105, tchau
+Dialogue: 0,0:19:49.500,0:19:53.100,JET,N178QS,0,0,0,,118.105, goodbye, N178QS
+Dialogue: 0,0:19:53.100,0:19:57.000,TWR,Lisboa Tower,0,0,0,,the whole tower and ground exchange for N178QS
