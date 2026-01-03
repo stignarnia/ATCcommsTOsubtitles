@@ -12,6 +12,7 @@ Style: T,Arial,56,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,
 Style: APP,Arial,56,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,1,20,20,20,1
 Style: TWR,Arial,56,&H000000FF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,1,20,20,20,1
 Style: GND,Arial,56,&H00FF00FF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,1,20,20,20,1
+Style: DEL,Arial,56,&H0000FFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,1,20,20,20,1
 Style: LH,Arial,56,&H00FF0000,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,3,20,20,20,1
 Style: TPY,Arial,56,&H00008000,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,3,20,20,20,1
 Style: JET,Arial,56,&H00FFFF00,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,3,20,20,20,1
@@ -20,6 +21,27 @@ Style: TPT,Arial,56,&H0000FFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
-Dialogue: 0,0:00:28.000,0:00:34.438,JET,N178QS,0,0,0,,Lisboa Arrival good evening, N178QS, FL250, inbound to LAZET, Information K
-Dialogue: 0,0:00:34.438,0:00:47.665,APP,Lisboa Approach,0,0,0,,N178QS, Lisboa Arrival boa tarde, identified. Descend FL80. Proceed direct RULOX, cleared LAZET arrival, expect ILS runway 02. Information K is now current, QNH 1020
-Dialogue: 0,0:00:47.665,0:00:56.998,JET,N178QS,0,0,0,,Descend FL80, QNH 1020, direct RULOX, cleared LAZET arrival, expect ILS runway 02, N178QS
+Dialogue: 0,0:00:28.000,0:00:33.095,JET,N178QS,0,0,0,,Lisboa Arrival good evening, N178QS, FL250, inbound to LAZET, Information K
+Dialogue: 0,0:00:33.095,0:00:43.087,APP,Lisboa Approach,0,0,0,,N178QS, Lisboa Arrival boa tarde, identified. Descend FL80. Proceed direct RULOX, cleared LAZET arrival, expect ILS runway 02. Information K is now current, QNH 1020
+Dialogue: 0,0:00:43.087,0:00:49.999,JET,N178QS,0,0,0,,Descend FL80, QNH 1020, direct RULOX, cleared LAZET arrival, expect ILS runway 02, N178QS
+Dialogue: 0,0:00:50.000,0:00:53.850,DEL,Lisboa Delivery,0,0,0,,delivery exchange for TAP438T
+Dialogue: 0,0:00:53.850,0:00:58.200,GND,Lisboa Ground,0,0,0,,pushback clearance exchange for TAP438T
+Dialogue: 0,0:01:03.000,0:01:05.700,DEL,Lisboa Delivery,0,0,0,,delivery exchange for EZS54LR
+Dialogue: 0,0:01:05.700,0:01:08.900,GND,Lisboa Ground,0,0,0,,pushback clearance exchange for EZS54LR
+Dialogue: 0,0:02:00.000,0:02:04.150,GND,Lisboa Ground,0,0,0,,taxi clearance exchange for TAP438T
+Dialogue: 0,0:02:17.000,0:02:20.000,GND,Lisboa Ground,0,0,0,,taxi clearance exchange for EZS54LR
+Dialogue: 0,0:04:30.000,0:04:33.800,GND,Lisboa Ground,0,0,0,,handoff to tower for TAP438T
+Dialogue: 0,0:04:33.800,0:04:38.100,TWR,Lisboa Tower,0,0,0,,takeoff clearance exchange for TAP438T
+Dialogue: 0,0:04:38.100,0:04:40.750,GND,Lisboa Ground,0,0,0,,handoff to tower for EZS54LR
+Dialogue: 0,0:05:40.000,0:05:43.850,TWR,Lisboa Tower,0,0,0,,line up and wait runway 02 exchange for EZS54LR
+Dialogue: 0,0:06:40.000,0:06:43.150,TWR,Lisboa Tower,0,0,0,,takeoff clearance exchange for EZS54LR
+Dialogue: 0,0:06:56.000,0:06:59.732,TPT,TAP438T,0,0,0,,Lisbon Departure, boa tarde, TAP438T, passing 2,300 feet climbing 4,000 feet, on IXIDA departure
+Dialogue: 0,0:06:59.732,0:07:02.686,APP,Lisboa Approach,0,0,0,,TAP438T, boa tarde, identified. Climb via SID to FL340, have a safe flight
+Dialogue: 0,0:07:02.686,0:07:04.999,TPT,TAP438T,0,0,0,,Climb via SID to FL340, obrigado TAP438T
+Dialogue: 0,0:07:05.000,0:07:07.950,APP,Lisboa Approach,0,0,0,,N178QS, proceed direct MAZUK
+Dialogue: 0,0:07:07.950,0:07:10.550,JET,N178QS,0,0,0,,Direct MAZUK, N178QS
+Dialogue: 0,0:08:22.000,0:08:30.550,EZS,EZS54LR,0,0,0,,Lisbon Departure, good evening, EZS54LR, passing 1,500 feet climbing 4,000 feet, on IXIDA departure
+Dialogue: 0,0:08:30.550,0:08:37.050,APP,Lisboa Approach,0,0,0,,EZS54LR, boa tarde, identified. Climb via SID to FL380, have a safe flight
+Dialogue: 0,0:08:37.050,0:08:41.950,EZS,EZS54LR,0,0,0,,Climb via SID to FL380, thank you EZS54LR
+Dialogue: 0,0:09:36.000,0:09:43.400,LH,DLH97V,0,0,0,,Lisboa Arrival good evening, DLH97V, FL350, inbound to INBOM, Information K
+Dialogue: 0,0:09:43.400,0:09:55.850,APP,Lisboa Approach,0,0,0,,DLH97V, Lisboa Arrival boa tarde, identified. Descend FL80. Cleared INBOM arrival, expect ILS runway 02. Information K is now current, QNH 1020
