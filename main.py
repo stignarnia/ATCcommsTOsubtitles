@@ -1,4 +1,6 @@
+import argparse
 import configparser
+import os
 from datetime import timedelta
 import webcolors
 
@@ -73,16 +75,17 @@ def get_speaker_style(
         "color": speaker_info.get("color", type_info.get("color", "white")),
     }
 
-def parse_comms_lines(path: str) -> list[tuple[str, str]]:
+def parse_comms_lines(path: str | None = None, lines: list[str] | None = None) -> list[tuple[str, str]]:
     """
     Parse the [comms] section preserving repeated keys and original order.
 
     Returns: list[tuple[str, str]] of (KEY, VALUE) where KEY is uppercased.
     """
-    lines = []
+    lines_out = []
     in_comms = False
-    with open(path, "r", encoding="utf-8") as f:
-        for raw in f:
+    iterator = lines if lines is not None else open(path, "r", encoding="utf-8")
+    try:
+        for raw in iterator:
             line = raw.strip()
             if not line or line.startswith(";") or line.startswith("#"):
                 continue
@@ -101,8 +104,12 @@ def parse_comms_lines(path: str) -> list[tuple[str, str]]:
                 v = v[1:-1]
             # Unescape any escaped quotes inside the value.
             v = v.replace('\\"', '"').replace("\\'", "'")
-            lines.append((k, v))
-    return lines
+            lines_out.append((k, v))
+    finally:
+        if lines is None:
+            iterator.close()
+
+    return lines_out
 
 def strip_outer_quotes(s: str) -> str:
     """Remove surrounding quotes if present and unescape internal escaped quotes."""
@@ -113,7 +120,7 @@ def strip_outer_quotes(s: str) -> str:
         s = s[1:-1]
     return s.replace('\\"', '"').replace("\\'", "'")
 
-def parse_ini_non_comms(path: str) -> configparser.ConfigParser:
+def parse_ini_non_comms(path: str | None = None, lines: list[str] | None = None) -> configparser.ConfigParser:
     """
     Parse everything except [comms].
 
@@ -126,8 +133,9 @@ def parse_ini_non_comms(path: str) -> configparser.ConfigParser:
     """
     kept_lines = []
     in_comms = False
-    with open(path, "r", encoding="utf-8") as f:
-        for raw in f:
+    iterator = lines if lines is not None else open(path, "r", encoding="utf-8")
+    try:
+        for raw in iterator:
             line = raw.strip()
             if line.startswith("[") and line.endswith("]"):
                 section = line[1:-1].strip().lower()
@@ -141,6 +149,9 @@ def parse_ini_non_comms(path: str) -> configparser.ConfigParser:
                 continue
 
             kept_lines.append(raw)
+    finally:
+        if lines is None:
+            iterator.close()
 
     config = configparser.ConfigParser()
     config.read_string("".join(kept_lines))
@@ -209,7 +220,7 @@ def _load_acronyms(config: configparser.ConfigParser) -> dict[str, str]:
             acr[key] = ext
     return acr
 
-def _load_waypoints(path: str) -> dict[str, set[str]]:
+def _load_waypoints(path: str | None = None, lines: list[str] | None = None) -> dict[str, set[str]]:
     """
     Load [waypoints.*] sections where each non-empty non-comment line is a waypoint token.
     Returns e.g. {"RNAV": {"LAZET", "RULOX"}} with tokens preserved as written.
@@ -217,8 +228,9 @@ def _load_waypoints(path: str) -> dict[str, set[str]]:
     waypoints = {}
     in_section = False
     current = None
-    with open(path, "r", encoding="utf-8") as f:
-        for raw in f:
+    iterator = lines if lines is not None else open(path, "r", encoding="utf-8")
+    try:
+        for raw in iterator:
             line = raw.strip()
             if not line or line.startswith(";") or line.startswith("#"):
                 continue
@@ -236,6 +248,10 @@ def _load_waypoints(path: str) -> dict[str, set[str]]:
                 parts = [p.strip() for p in line.split(",") if p.strip()]
                 for p in parts:
                     waypoints[current].add(p)
+    finally:
+        if lines is None:
+            iterator.close()
+
     return waypoints
 
 def estimate_spoken_length(text: str, acronyms: dict[str, str] | None = None, waypoints: set[str] | None = None) -> int:
@@ -376,11 +392,15 @@ def parse_timestamp_to_timedelta(value: str, fmt: str) -> timedelta:
 
     raise ValueError(f"Unsupported timestamp format in INI: {fmt!r}")
 
-def main() -> None:
+def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") -> None:
     # Parse non-[comms] sections normally, but parse [comms] manually to preserve
     # repeated keys and ordering.
-    config = parse_ini_non_comms('comms.ini')
-    comms_lines = parse_comms_lines('comms.ini')
+    # Read the INI file once into memory and pass the lines to all parsers.
+    with open(input_path, "r", encoding="utf-8") as _f:
+        ini_lines = _f.readlines()
+
+    config = parse_ini_non_comms(lines=ini_lines)
+    comms_lines = parse_comms_lines(lines=ini_lines)
 
     ass_file = []
 
@@ -414,7 +434,7 @@ def main() -> None:
 
     acronyms = _load_acronyms(config)
     # Load declared waypoints (e.g. [waypoints.RNAV]) so they are spoken literally, not as NATO.
-    waypoints = _load_waypoints('comms.ini')
+    waypoints = _load_waypoints(lines=ini_lines)
     # Flatten all waypoint tokens into a set of uppercased tokens for quick membership checks.
     literal_waypoints = set()
     for s in waypoints.values():
@@ -555,8 +575,92 @@ def main() -> None:
         i = j
 
 
-    with open("comms.ass", "w", encoding="utf-8") as f:
+    # Ensure output directory exists
+    out_dir = os.path.dirname(os.path.abspath(output_path))
+    if out_dir and not os.path.exists(out_dir):
+        os.makedirs(out_dir, exist_ok=True)
+
+    with open(output_path, "w", encoding="utf-8") as f:
         f.write("\n".join(ass_file))
+
+
+def init_template(name: str = "comms.ini") -> None:
+    """Create a starter INI file at `name` if it doesn't exist."""
+    if os.path.exists(name):
+        print(f"File already exists: {name}")
+        return
+
+    sample = """; Meta types
+[metaTypes.Timestamp]
+; Every combination of hours, minutes, seconds and milliseconds is supported
+format = mm:ss
+; Characters-per-second used for subtitle duration estimation when fitting lines between T markers
+cps = 15
+
+[metaTypes.Comment]
+position = top-left
+color = gray
+
+; Speaker types
+[speakerTypes.ATC]
+position = bottom-left
+color = white
+
+[speakerTypes.Pilot]
+position = bottom-right
+color = cyan
+
+; Meta tags
+[meta.T]
+type = Timestamp
+
+[meta.C]
+type = Comment
+
+; Speakers
+[speakers.APP]
+name = Lisboa Approach
+type = ATC
+
+[speakers.LH]
+name = DLH97V
+type = Pilot
+color = blue
+
+; Acronyms
+[acronyms.FL]
+extension = Flight Level
+
+; Waypoints
+[waypoints.RNAV]
+LAZET
+
+; Comms
+[comms]
+T = 00:00
+C = Time: 18:50 UTC on December 30, 2025, ATIS K in effect, QNH 1020 hPa
+LH = Lisboa Arrival good evening, DLH97V, FL350, inbound to INBOM, Information K
+"""
+
+    with open(name, "w", encoding="utf-8") as f:
+        f.write(sample)
+    print(f"Wrote template INI to {name}")
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Compile comms INI to ASS or initialize a template INI.")
+    parser.add_argument("command", nargs="?", choices=["compile", "init"], default="compile", help="Command to run (default: compile)")
+    parser.add_argument("-i", "--input", default="comms.ini", help="Input INI file (for compile)")
+    parser.add_argument("-o", "--output", default="comms.ass", help="Output ASS file (for compile)")
+    parser.add_argument("--name", default="comms.ini", help="Name for initialized INI file (for init)")
+
+    args = parser.parse_args()
+
+    if args.command == "init":
+        init_template(args.name)
+    else:
+        # compile (default)
+        generate_ass(args.input, args.output)
+
 
 if __name__ == "__main__":
     main()
