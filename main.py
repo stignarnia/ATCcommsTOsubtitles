@@ -613,23 +613,59 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
     markers_by_index = {midx: (t, cps) for midx, t, cps in markers}
 
     # Second pass: generate dialogue lines.
-    # Timing behavior:
-    # - Within a block (from a timestamp marker to the next timestamp marker), allocate the available time
-    #   across the messages in that block.
-    # - If the block has no next marker, use estimated durations (no global fixed fallback).
+    #
+    # Timing behavior (two rails):
+    # - Speaker lines are sequential on the "speakers rail".
+    # - Non-timestamp meta lines (e.g. C=Comment) are sequential on the "meta rail".
+    # - Both rails start at the block's timestamp marker and run independently (can overlap).
+    # - For a bounded block (there is a next timestamp marker), each rail is scaled down
+    #   independently if it would exceed the available time (so comments never steal time
+    #   from speakers).
+    # - Block duration is max(end_speakers_rail, end_meta_rail). Next blocks still start
+    #   at their own timestamp markers (overlap is allowed in ASS).
+    meta_non_timestamp_keys = set(meta.keys()) - timestamp_meta_keys
+    speaker_keys = set(speakers.keys())
+
+    def _scale_durations_to_fit(durations: list[timedelta], max_ms: int) -> list[int]:
+        """Convert durations to ms, and if their sum exceeds max_ms, scale them down (>=1ms each)."""
+        est_ms = [max(1, int(d.total_seconds() * 1000)) for d in durations]
+        sum_est = sum(est_ms)
+
+        if max_ms <= 0:
+            return [1 for _ in est_ms]
+
+        if sum_est <= max_ms:
+            return est_ms
+
+        scale = max_ms / max(1, sum_est)
+        scaled_ms = [max(1, int(ms * scale)) for ms in est_ms]
+
+        # Fix rounding drift so total fits without exceeding max_ms.
+        drift = sum(scaled_ms) - max_ms
+        k = 0
+        while drift > 0 and k < len(scaled_ms):
+            if scaled_ms[k] > 1:
+                scaled_ms[k] -= 1
+                drift -= 1
+            else:
+                k += 1
+
+        return scaled_ms
+
+    # Collect Dialogue lines first, then emit them sorted by start time for robustness.
+    pending_events: list[tuple[timedelta, int, str]] = []
+
     i = 0
     while i < len(comms_lines):
-        key, value = comms_lines[i]
-
         if i not in markers_by_index:
             # Disallow implicit timing without a preceding timestamp marker.
             raise ValueError("First [comms] entry must be a timestamp marker (e.g. T=...).")
 
         # Start of a timed block
         block_start, block_cps = markers_by_index[i]
-        current_time = block_start
 
         block_end = next_marker_time(i)
+
         # Collect messages until next timestamp marker (or EOF)
         j = i + 1
         block_msgs: list[tuple[str, str]] = []
@@ -641,55 +677,73 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
             i = j
             continue
 
-        # Estimate per-line durations using the CPS associated with this block's start marker.
-        est = [estimate_duration(mval, cps=block_cps, acronyms=acronyms, waypoints=literal_waypoints) for _, mval in block_msgs]
-
-        if block_end is None or block_end <= block_start:
-            # No bounding marker: use estimated durations, ensuring monotonic progress.
-            for (mkey, mval), dur in zip(block_msgs, est, strict=True):
-                start_time = current_time
-                end_time = start_time + (dur if dur.total_seconds() > 0 else fallback_duration)
-
-                text_val = strip_outer_quotes(mval)
-                ass_file.append(
-                    f"Dialogue: 0,{format_time(start_time)},{format_time(end_time)},{mkey},{escape_ass_text(get_speaker_style(mkey, speakers, types, meta)['display_name'])},0,0,0,,{escape_ass_text(text_val)}"
-                )
-                current_time = end_time
-        else:
-            max_total = block_end - block_start
-            max_ms = int(max_total.total_seconds() * 1000)
-
-            est_ms = [max(1, int(d.total_seconds() * 1000)) for d in est]  # avoid 0ms lines
-            sum_est = sum(est_ms)
-
-            if sum_est <= max_ms:
-                scaled_ms = est_ms
+        # Split into rails
+        speaker_msgs: list[tuple[str, str]] = []
+        meta_msgs: list[tuple[str, str]] = []
+        for mkey, mval in block_msgs:
+            if mkey in meta_non_timestamp_keys and mkey not in speaker_keys:
+                meta_msgs.append((mkey, mval))
             else:
-                # Linear reduction: scale all durations by same factor so they fit before next marker.
-                scale = max_ms / max(1, sum_est)
-                scaled_ms = [max(1, int(ms * scale)) for ms in est_ms]
+                speaker_msgs.append((mkey, mval))
 
-                # Fix rounding drift so total fits exactly (or as close as possible) without exceeding.
-                drift = sum(scaled_ms) - max_ms
-                k = 0
-                while drift > 0 and k < len(scaled_ms):
-                    if scaled_ms[k] > 1:
-                        scaled_ms[k] -= 1
-                        drift -= 1
-                    else:
-                        k += 1
+        is_bounded = block_end is not None and block_end > block_start
+        max_ms = int((block_end - block_start).total_seconds() * 1000) if is_bounded else 0
 
-            for (mkey, mval), dur_ms in zip(block_msgs, scaled_ms, strict=True):
-                start_time = current_time
-                end_time = start_time + timedelta(milliseconds=dur_ms)
+        # Speakers rail durations
+        speaker_est = [
+            estimate_duration(mval, cps=block_cps, acronyms=acronyms, waypoints=literal_waypoints)
+            for _, mval in speaker_msgs
+        ]
+        if is_bounded:
+            speaker_ms = _scale_durations_to_fit(speaker_est, max_ms)
+        else:
+            speaker_ms = [max(1, int(d.total_seconds() * 1000)) for d in speaker_est]
 
-                text_val = strip_outer_quotes(mval)
-                ass_file.append(
-                    f"Dialogue: 0,{format_time(start_time)},{format_time(end_time)},{mkey},{escape_ass_text(get_speaker_style(mkey, speakers, types, meta)['display_name'])},0,0,0,,{escape_ass_text(text_val)}"
-                )
-                current_time = end_time
+        # Meta rail durations (reuse the block's Timestamp CPS, per requirement)
+        meta_est = [
+            estimate_duration(mval, cps=block_cps, acronyms=acronyms, waypoints=literal_waypoints)
+            for _, mval in meta_msgs
+        ]
+        if is_bounded:
+            meta_ms = _scale_durations_to_fit(meta_est, max_ms)
+        else:
+            meta_ms = [max(1, int(d.total_seconds() * 1000)) for d in meta_est]
+
+        # Emit speaker rail (layer 0)
+        speakers_current = block_start
+        for (mkey, mval), dur_ms in zip(speaker_msgs, speaker_ms, strict=True):
+            start_time = speakers_current
+            end_time = start_time + timedelta(milliseconds=dur_ms if dur_ms > 0 else int(fallback_duration.total_seconds() * 1000))
+
+            text_val = strip_outer_quotes(mval)
+            line = (
+                f"Dialogue: 0,{format_time(start_time)},{format_time(end_time)},{mkey},"
+                f"{escape_ass_text(get_speaker_style(mkey, speakers, types, meta)['display_name'])},0,0,0,,"
+                f"{escape_ass_text(text_val)}"
+            )
+            pending_events.append((start_time, 0, line))
+            speakers_current = end_time
+
+        # Emit meta rail (layer 1 so it draws above speakers if overlapping)
+        meta_current = block_start
+        for (mkey, mval), dur_ms in zip(meta_msgs, meta_ms, strict=True):
+            start_time = meta_current
+            end_time = start_time + timedelta(milliseconds=dur_ms if dur_ms > 0 else int(fallback_duration.total_seconds() * 1000))
+
+            text_val = strip_outer_quotes(mval)
+            line = (
+                f"Dialogue: 1,{format_time(start_time)},{format_time(end_time)},{mkey},"
+                f"{escape_ass_text(get_speaker_style(mkey, speakers, types, meta)['display_name'])},0,0,0,,"
+                f"{escape_ass_text(text_val)}"
+            )
+            pending_events.append((start_time, 1, line))
+            meta_current = end_time
 
         i = j
+
+    pending_events.sort(key=lambda t: (t[0], t[1]))
+    for _start, _layer, line in pending_events:
+        ass_file.append(line)
 
     # Ensure output directory exists
     out_dir = os.path.dirname(os.path.abspath(output_path))
