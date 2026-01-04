@@ -39,7 +39,6 @@ def ass_color(color_value: str) -> str:
     except Exception:
         return "&H00FFFFFF"
 
-
 def format_time(td: timedelta) -> str:
     """Format a timedelta into ASS time format (H:MM:SS.mmm)."""
     total_seconds = int(td.total_seconds())
@@ -120,12 +119,11 @@ def _normalize_position(pos: str | None) -> str:
 
     return "bottom-left"
 
-
 def _position_to_alignment(pos: str | None) -> int:
     """Map normalized position to ASS alignment (1-9).
 
     ASS alignment mapping:
-      bottom-left=1, bottom-center=2, bottom-righbeht=3,
+      bottom-left=1, bottom-center=2, bottom-right=3,
       middle-left=4, middle-center=5, middle-right=6,
       top-left=7, top-center=8, top-right=9
     """
@@ -322,7 +320,18 @@ def _load_waypoints(path: str | None = None, lines: list[str] | None = None) -> 
 
     return waypoints
 
-def estimate_spoken_length(text: str, acronyms: dict[str, str] | None = None, waypoints: set[str] | None = None) -> int:
+def _is_timestamp_name(name: str) -> bool:
+    return (name or "").strip().lower() == "timestamp"
+
+def _ensure_no_timing_keys(info: dict, subject: str) -> None:
+    if "format" in info or "cps" in info:
+        raise ValueError(f"{subject} may not define 'format' or 'cps' (only 'Timestamp' may)")
+
+def _ensure_no_visual_keys(info: dict, subject: str) -> None:
+    if "position" in info or "color" in info:
+        raise ValueError(f"{subject} must not define 'position' or 'color'")
+
+def estimate_spoken_length(text: str, acronyms: dict[str, str] | None = None, waypoints: set[str] | None = None, visited_acronyms: set[str] | None = None) -> int:
     """
     Estimate "spoken character length" (unitless) based on:
       - acronym expansions from [acronyms.*] computed FIRST (e.g. "FL350" -> "Flight Level 350")
@@ -338,6 +347,7 @@ def estimate_spoken_length(text: str, acronyms: dict[str, str] | None = None, wa
     """
     acronyms = acronyms or {}
     waypoints = set(w.upper() for w in (waypoints or set()))
+    visited = set(visited_acronyms or ())
 
     total = 0
     for token in text.split():
@@ -356,13 +366,20 @@ def estimate_spoken_length(text: str, acronyms: dict[str, str] | None = None, wa
             suffix = stripped[k:]
 
         if prefix and prefix in acronyms:
-            # Speak the expansion (normal words) + then process the suffix (often digits).
-            total += estimate_spoken_length(acronyms[prefix], acronyms={}, waypoints=waypoints)
-            if suffix:
-                total += 1  # word boundary
-                total += estimate_spoken_length(suffix, acronyms={}, waypoints=waypoints)
-            total += 1  # space boundary after token
-            continue
+            # Avoid infinite recursion when acronym expansions reference each other.
+            if prefix in visited:
+                # Already expanding this acronym in the current chain — treat literally (fall through).
+                pass
+            else:
+                # Speak the expansion (normal words) + then process the suffix (often digits).
+                # Preserve the acronyms mapping so nested expansions work, tracking visited keys.
+                visited.add(prefix)
+                total += estimate_spoken_length(acronyms[prefix], acronyms=acronyms, waypoints=waypoints, visited_acronyms=visited)
+                if suffix:
+                    total += 1  # word boundary
+                    total += estimate_spoken_length(suffix, acronyms=acronyms, waypoints=waypoints, visited_acronyms=visited)
+                total += 1  # space boundary after token
+                continue
 
         # 2) NATO expansion for ALL-UPPERCASE tokens only.
         # Avoid NATO when any uppercase letter is followed by a lowercase letter (e.g. "A321neo").
@@ -475,7 +492,7 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
     config = parse_ini_non_comms(lines=ini_lines)
     comms_lines = parse_comms_lines(lines=ini_lines)
 
-    ass_file = []
+    ass_file: list[str] = []
 
     # [Script Info]
     ass_file.append("[Script Info]")
@@ -493,17 +510,39 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
     # Default Style
     ass_file.append("Style: Default,Arial,56,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,1,10,10,10,1")
 
-    # Collect type definitions. Use the new "metaTypes." and "speakerTypes."".
+    # Collect type definitions. Use the new "metaTypes." and "speakerTypes.".
     types = {}
     for s in config.sections():
         if s.startswith("metaTypes.") or s.startswith("speakerTypes."):
             types[s.split(".", 1)[1].strip()] = dict(config.items(s))
+
+    # Validate types: only the 'Timestamp' type may define timing keys;
+    # and the 'Timestamp' type must not define visual keys like position/color.
+    for tname, tinfo in types.items():
+        if _is_timestamp_name(tname):
+            _ensure_no_visual_keys(tinfo, f"Type '{tname}'")
+        else:
+            _ensure_no_timing_keys(tinfo, f"Type '{tname}'")
 
     # Speakers remain under [speakers.*]
     speakers = {s.split('.')[-1]: dict(config.items(s)) for s in config.sections() if s.startswith('speakers.')}
 
     # Meta mappings (short tags used in [comms], e.g. [meta.T] or [meta.C])
     meta = {s.split('.')[-1]: dict(config.items(s)) for s in config.sections() if s.startswith('meta.')}
+
+    # Validate meta entries:
+    # - Only metas of type 'Timestamp' may provide timing keys (format/cps).
+    # - Timestamp metas must not define visual keys (position/color).
+    timestamp_meta_keys = set()
+    for mk, mv in meta.items():
+        mtype = (mv.get("type") or "").strip()
+        if not mtype:
+            continue
+        if _is_timestamp_name(mtype):
+            _ensure_no_visual_keys(mv, f"Meta '{mk}' is a Timestamp")
+            timestamp_meta_keys.add(mk)
+        else:
+            _ensure_no_timing_keys(mv, f"Meta '{mk}' has type '{mtype}'")
 
     acronyms = _load_acronyms(config)
     # Load declared waypoints (e.g. [waypoints.RNAV]) so they are spoken literally, not as NATO.
@@ -512,9 +551,9 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
     literal_waypoints = set()
     for s in waypoints.values():
         literal_waypoints.update(w.upper() for w in s)
-    
-    # Use stable ASS style names (speaker keys and meta keys), not display names that may contain spaces.
-    style_keys = list(speakers.keys()) + [k for k in meta.keys() if k != "T"]
+
+    # Use stable ASS style names (speaker keys and non-timestamp meta keys), not display names that may contain spaces.
+    style_keys = list(speakers.keys()) + [k for k in meta.keys() if k not in timestamp_meta_keys]
     for speaker_key in style_keys:
         style = get_speaker_style(speaker_key, speakers, types, meta)
 
@@ -538,54 +577,63 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
     # Used only if a computed/estimated duration would be 0ms (guard rail).
     fallback_duration = timedelta(milliseconds=1)
 
-    # Timestamp format from INI is used only for interpreting T tags.
-    # The timestamp tag (e.g. meta key "T") can remap which type provides format/cps via [meta.T] -> type name.
-    timestamp_type_name = meta.get("T", {}).get("type", "Timestamp")
-    t_fmt = types.get(timestamp_type_name, {}).get("format", "mm:ss")
-    speech_cps = float(types.get(timestamp_type_name, {}).get("cps", "15"))
-
-    # First pass: collect all explicit T markers (index + time)
-    markers: list[tuple[int, timedelta]] = []
+    # First pass: collect all explicit timestamp markers (index + parsed time + cps)
+    # Only meta keys whose [meta.<KEY>] declares type = Timestamp are valid timestamp markers.
+    # Prebuild a map from timestamp meta keys to their timing info for a single-pass lookup.
+    ts_info = {k: types.get((meta[k].get("type") or "").strip(), {}) for k in timestamp_meta_keys}
+    markers: list[tuple[int, timedelta, float]] = []
     for idx, (key, value) in enumerate(comms_lines):
-        if key == "T":
-            markers.append((idx, parse_timestamp_to_timedelta(value, t_fmt)))
+        info = ts_info.get(key)
+        if not info:
+            continue
+        t_fmt = info.get("format", "mm:ss")
+        cps = float(info.get("cps", "15"))
+        markers.append((idx, parse_timestamp_to_timedelta(value, t_fmt), cps))
+    # Note: bare "T" markers without a corresponding [meta.T] entry are invalid and will be caught
+    # by the comms speaker-key validation below.
+
+    marker_indices = {midx for midx, _t, _c in markers}
 
     # Helper: find the next marker time after a given index
     def next_marker_time(after_idx: int):
-        for i, t in markers:
-            if i > after_idx:
+        for midx, t, _ in markers:
+            if midx > after_idx:
                 return t
         return None
 
-    # Validate comms speaker keys early (ignore T markers).
-    known_speakers = set(speakers.keys()) | (set(meta.keys()) - {"T"})
+    # Validate comms speaker keys early (ignore timestamp markers).
+    known_speakers = set(speakers.keys()) | (set(meta.keys()) - timestamp_meta_keys)
     for idx, (k, _v) in enumerate(comms_lines):
-        if k != "T" and k not in known_speakers:
+        if idx in marker_indices:
+            continue
+        if k not in known_speakers:
             raise ValueError(f"Unknown speaker key {k!r} in [comms] at index {idx}")
+
+    # Map markers by their index for quick lookup during processing
+    markers_by_index = {midx: (t, cps) for midx, t, cps in markers}
 
     # Second pass: generate dialogue lines.
     # Timing behavior:
-    # - Within a block (from a T to the next T), allocate the available time
+    # - Within a block (from a timestamp marker to the next timestamp marker), allocate the available time
     #   across the messages in that block.
-    # - If the block has no next T, fall back to fixed 5s per message.
+    # - If the block has no next marker, use estimated durations (no global fixed fallback).
     i = 0
     while i < len(comms_lines):
         key, value = comms_lines[i]
 
-        if key != "T":
-            # Disallow implicit timing without a preceding T; otherwise we'd need a global
-            # timeline and rules for where it should start.
-            raise ValueError("First [comms] entry must be T=... (timestamp).")
+        if i not in markers_by_index:
+            # Disallow implicit timing without a preceding timestamp marker.
+            raise ValueError("First [comms] entry must be a timestamp marker (e.g. T=...).")
 
-        # key == "T": start of a timed block
-        block_start = parse_timestamp_to_timedelta(value, t_fmt)
+        # Start of a timed block
+        block_start, block_cps = markers_by_index[i]
         current_time = block_start
 
         block_end = next_marker_time(i)
-        # Collect messages until next T (or EOF)
+        # Collect messages until next timestamp marker (or EOF)
         j = i + 1
-        block_msgs = []
-        while j < len(comms_lines) and comms_lines[j][0] != "T":
+        block_msgs: list[tuple[str, str]] = []
+        while j < len(comms_lines) and j not in marker_indices:
             block_msgs.append(comms_lines[j])
             j += 1
 
@@ -593,11 +641,11 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
             i = j
             continue
 
-        # Estimate per-line durations (smart), then clamp to fit before next T.
-        est = [estimate_duration(mval, cps=speech_cps, acronyms=acronyms, waypoints=literal_waypoints) for _, mval in block_msgs]
+        # Estimate per-line durations using the CPS associated with this block's start marker.
+        est = [estimate_duration(mval, cps=block_cps, acronyms=acronyms, waypoints=literal_waypoints) for _, mval in block_msgs]
 
         if block_end is None or block_end <= block_start:
-            # No max bound: just use estimated durations, but ensure monotonic progress
+            # No bounding marker: use estimated durations, ensuring monotonic progress.
             for (mkey, mval), dur in zip(block_msgs, est, strict=True):
                 start_time = current_time
                 end_time = start_time + (dur if dur.total_seconds() > 0 else fallback_duration)
@@ -617,7 +665,7 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
             if sum_est <= max_ms:
                 scaled_ms = est_ms
             else:
-                # Linear reduction: scale all durations by same factor so they fit before next T.
+                # Linear reduction: scale all durations by same factor so they fit before next marker.
                 scale = max_ms / max(1, sum_est)
                 scaled_ms = [max(1, int(ms * scale)) for ms in est_ms]
 
@@ -643,7 +691,6 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
 
         i = j
 
-
     # Ensure output directory exists
     out_dir = os.path.dirname(os.path.abspath(output_path))
     if out_dir and not os.path.exists(out_dir):
@@ -651,7 +698,6 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
 
     with open(output_path, "w", encoding="utf-8") as f:
         f.write("\n".join(ass_file))
-
 
 def init_template(name: str = "comms.ini") -> None:
     """Create a starter INI file at `name` if it doesn't exist."""
@@ -730,7 +776,6 @@ def main() -> None:
     else:
         # compile (default)
         generate_ass(args.input, args.output)
-
 
 if __name__ == "__main__":
     main()
