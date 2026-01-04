@@ -9,14 +9,18 @@ def escape_ass_text(text: str) -> str:
     # Curly braces start override blocks in ASS.
     return text.replace("{", r"\{").replace("}", r"\}")
 
-def ass_color(color_value: str) -> str:
+def ass_color(color_value: str, *, keep_alpha: bool = False) -> str:
     """
-    Convert a CSS-ish color string into ASS color format (&H00BBGGRR).
+    Convert a CSS-ish color string into ASS color format (&H[AABBGGRR]).
 
     Supports:
       - #RRGGBB
-      - #AARRGGBB (alpha ignored)
+      - #AARRGGBB (ARGB). Alpha is optionally preserved by setting keep_alpha=True.
       - named colors via `webcolors`
+
+    Notes:
+      - ASS alpha is inverted vs. common ARGB notation: 00 = opaque, FF = transparent.
+      - When keep_alpha=False, alpha is always forced to 00 (opaque).
     """
     if not color_value:
         return "&H00FFFFFF"
@@ -24,13 +28,22 @@ def ass_color(color_value: str) -> str:
     s = color_value.strip()
     if s.startswith("#"):
         hexv = s[1:]
-        if len(hexv) == 8:  # AARRGGBB
+        alpha = "00"
+
+        # ARGB: #AARRGGBB
+        if len(hexv) == 8:
+            css_alpha = int(hexv[0:2], 16)
+            if keep_alpha:
+                ass_alpha = 255 - css_alpha
+                alpha = f"{ass_alpha:02X}"
             hexv = hexv[2:]
+
         if len(hexv) == 6:
             r = int(hexv[0:2], 16)
             g = int(hexv[2:4], 16)
             b = int(hexv[4:6], 16)
-            return f"&H00{b:02X}{g:02X}{r:02X}"
+            return f"&H{alpha}{b:02X}{g:02X}{r:02X}"
+
         return "&H00FFFFFF"
 
     try:
@@ -38,6 +51,19 @@ def ass_color(color_value: str) -> str:
         return f"&H00{rgb.blue:02X}{rgb.green:02X}{rgb.red:02X}"
     except Exception:
         return "&H00FFFFFF"
+
+def split_ass_color(ass: str) -> tuple[str, str]:
+    """
+    Split an ASS color string (&HAABBGGRR) into (AA, BBGGRR) for use with overrides:
+      - \\1a&HAA&
+      - \\1c&HBBGGRR&
+    """
+    s = (ass or "").strip()
+    if s.startswith("&H"):
+        s = s[2:]
+    if len(s) == 8:
+        return s[0:2], s[2:8]
+    return "00", "000000"
 
 def format_time(td: timedelta) -> str:
     """Format a timedelta into ASS/SSA time format (H:MM:SS.cc).
@@ -80,6 +106,7 @@ def get_speaker_style(
         "display_name": speaker_info.get("name", speaker_key),
         "position": type_info.get("position", "bottom-left"),
         "color": speaker_info.get("color", type_info.get("color", "white")),
+        "background": speaker_info.get("background", type_info.get("background", "none")),
     }
 
 def _normalize_position(pos: str | None) -> str:
@@ -336,8 +363,8 @@ def _ensure_no_timing_keys(info: dict, subject: str) -> None:
         raise ValueError(f"{subject} may not define 'format' or 'cps' (only 'Timestamp' may)")
 
 def _ensure_no_visual_keys(info: dict, subject: str) -> None:
-    if "position" in info or "color" in info:
-        raise ValueError(f"{subject} must not define 'position' or 'color'")
+    if "position" in info or "color" in info or "background" in info:
+        raise ValueError(f"{subject} must not define 'position', 'color' or 'background'")
 
 def estimate_spoken_length(text: str, acronyms: dict[str, str] | None = None, waypoints: set[str] | None = None, visited_acronyms: set[str] | None = None) -> int:
     """
@@ -560,6 +587,133 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
     for s in waypoints.values():
         literal_waypoints.update(w.upper() for w in s)
 
+    # Background rendering: draw a solid rectangle as a separate ASS drawing event.
+    # This avoids relying on BorderStyle=3 behavior which varies between renderers.
+    #
+    # Important: ASS doesn't expose text-measurement, so rectangle width is an approximation.
+    play_res_x = 1920
+    play_res_y = 1080
+    font_size = 56
+    margin_l = 20
+    margin_r = 20
+    margin_v = 20
+
+    # Approximate font metrics for multi-line boxes.
+    # ASS auto-wrap is renderer-dependent; we use a crude word-wrap simulation to estimate it.
+    # Tuned to avoid overly tall/wide boxes.
+    bg_line_h = int(font_size * 1.10)  # approx line height at fontsize=56
+    bg_pad_y = 8  # vertical padding inside the rectangle (top+bottom)
+
+    # Asymmetric padding: more padding on the right than on the left.
+    bg_pad_left = 10
+    bg_pad_right = 30
+
+    width_scale = 0.92  # shrink width a bit vs. the crude units*fontsize mapping
+
+    def wrap_metrics(text: str) -> tuple[int, float]:
+        """
+        Return (wrapped_line_count, max_line_units) using a crude word-wrap simulation.
+        - Respects explicit ASS line breaks (\\N).
+        - Approximates word-wrapping using usable width: PlayResX - MarginL - MarginR.
+        """
+        usable_px = max(1, play_res_x - margin_l - margin_r)
+        max_units_per_line = usable_px / max(1, font_size)
+
+        segments = (text or "").replace("\n", "\\N").split("\\N")
+
+        total_lines = 0
+        max_line_units_seen = 0.0
+
+        for seg in segments:
+            words = seg.split()
+            if not words:
+                total_lines += 1
+                continue
+
+            line_units = 0.0
+            for w in words:
+                w_units = sum(_char_width_units(ch) for ch in w)
+                space_units = _char_width_units(" ")
+
+                if line_units <= 0.0:
+                    line_units = w_units
+                else:
+                    if line_units + space_units + w_units <= max_units_per_line:
+                        line_units += space_units + w_units
+                    else:
+                        max_line_units_seen = max(max_line_units_seen, line_units)
+                        total_lines += 1
+                        line_units = w_units
+
+            max_line_units_seen = max(max_line_units_seen, line_units)
+            total_lines += 1
+
+        return max(1, total_lines), max_line_units_seen
+
+    def estimate_box_height_px(text: str) -> int:
+        lines, _max_units = wrap_metrics(text)
+        return (lines * bg_line_h) + (2 * bg_pad_y)
+
+    def bg_y_top(alignment: int, height: int) -> int:
+        # top row: 7,8,9 ; middle row: 4,5,6 ; bottom row: 1,2,3
+        if alignment in (7, 8, 9):
+            return margin_v
+        if alignment in (4, 5, 6):
+            return (play_res_y // 2) - (height // 2)
+        return play_res_y - margin_v - height
+
+    def _char_width_units(ch: str) -> float:
+        # Very rough per-character width model for Arial-ish proportional fonts.
+        # Tuned down slightly to avoid overly wide boxes.
+        if ch == " ":
+            return 0.25
+        if ch in ".,:;!|'`":
+            return 0.24
+        if ch in "ilI[]()":
+            return 0.30
+        if ch in "MW@#%":
+            return 0.82
+        return 0.52
+
+    def estimate_text_core_width_px(text: str) -> int:
+        """Approximate width of the rendered text (no padding), accounting for auto-wrapping."""
+        _lines, max_units = wrap_metrics(text)
+        return max(1, int(max_units * font_size * width_scale))
+
+    def bg_box_x(alignment: int, text_w: int) -> tuple[int, int]:
+        """Return (x_left, box_width) for the background rectangle."""
+        # Determine approximate text left/right based on alignment + margins.
+        if alignment in (1, 4, 7):  # left
+            text_left = margin_l
+        elif alignment in (2, 5, 8):  # center
+            text_left = (play_res_x // 2) - (text_w // 2)
+        else:  # right
+            text_left = play_res_x - margin_r - text_w
+
+        text_right = text_left + text_w
+
+        # Desired padded rectangle.
+        box_left = text_left - bg_pad_left
+        box_right = text_right + bg_pad_right
+
+        # Clamp within the video frame; if we overflow on the right, shift left (reduces left padding).
+        if box_right > play_res_x:
+            shift = box_right - play_res_x
+            box_left -= shift
+            box_right = play_res_x
+
+        # Clamp on the left; if we overflow, shift right.
+        if box_left < 0:
+            shift = -box_left
+            box_left = 0
+            box_right = min(play_res_x, box_right + shift)
+
+        box_width = max(1, int(box_right - box_left))
+        box_left = max(0, min(int(box_left), play_res_x - box_width))
+        return box_left, box_width
+
+    style_render: dict[str, dict[str, object]] = {}
+
     # Use stable ASS style names (speaker keys and non-timestamp meta keys), not display names that may contain spaces.
     style_keys = list(speakers.keys()) + [k for k in meta.keys() if k not in timestamp_meta_keys]
     for speaker_key in style_keys:
@@ -567,11 +721,27 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
 
         color = ass_color(style["color"])
 
+        bg_raw = (style.get("background") or "").strip().lower()
+        has_bg = bool(bg_raw and bg_raw != "none")
+        bg_ass = ass_color(style.get("background", ""), keep_alpha=True) if has_bg else "&H00000000"
+
+        # Keep text styling consistent; background is drawn separately as a rectangle event.
+        back_colour = "&H00000000"
+        border_style = 1
+        outline = 2
+        shadow = 2
+
         # Determine alignment (map normalized positions to ASS 1-9)
         alignment = _position_to_alignment(style.get("position"))
 
+        style_render[speaker_key] = {
+            "has_bg": has_bg,
+            "bg_ass": bg_ass,
+            "alignment": alignment,
+        }
+
         ass_file.append(
-            f"Style: {speaker_key},Arial,56,{color},&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,{alignment},20,20,20,1"
+            f"Style: {speaker_key},Arial,56,{color},&H000000FF,&H00000000,{back_colour},0,0,0,0,100,100,0,0,{border_style},{outline},{shadow},{alignment},20,20,20,1"
         )
         
     ass_file.append("")
@@ -663,6 +833,30 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
     # Collect Dialogue lines first, then emit them sorted by start time for robustness.
     pending_events: list[tuple[timedelta, int, str]] = []
 
+    def _maybe_add_bg_event(*, sr: dict[str, object], text: str, start: timedelta, end: timedelta) -> None:
+        """If the style declares a background, add a rectangle-drawing event behind the text."""
+        if not sr.get("has_bg"):
+            return
+
+        bg_alpha, bg_bbggrr = split_ass_color(str(sr.get("bg_ass", "&H00000000")))
+        alignment = int(sr.get("alignment", 1))
+
+        height = estimate_box_height_px(text)
+        y_top = bg_y_top(alignment, height)
+
+        text_w = estimate_text_core_width_px(text)
+        x_left, width = bg_box_x(alignment, text_w)
+
+        bg_text = (
+            f"{{\\p1\\pos({x_left},{y_top})\\an7\\bord0\\shad0\\1c&H{bg_bbggrr}&\\1a&H{bg_alpha}&}}"
+            f"m 0 0 l {width} 0 l {width} {height} l 0 {height}"
+            f"{{\\p0}}"
+        )
+
+        # Write with Layer=0 but force ordering (sort layer = -1) so it is behind same-start text.
+        bg_line = f"Dialogue: 0,{format_time(start)},{format_time(end)},Default,,0,0,0,,{bg_text}"
+        pending_events.append((start, -1, bg_line))
+
     i = 0
     while i < len(comms_lines):
         if i not in markers_by_index:
@@ -724,6 +918,9 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
             end_time = start_time + timedelta(milliseconds=dur_ms if dur_ms > 0 else int(fallback_duration.total_seconds() * 1000))
 
             text_val = strip_outer_quotes(mval)
+            sr = style_render.get(mkey) or {}
+            _maybe_add_bg_event(sr=sr, text=text_val, start=start_time, end=end_time)
+
             line = (
                 f"Dialogue: 0,{format_time(start_time)},{format_time(end_time)},{mkey},"
                 f"{escape_ass_text(get_speaker_style(mkey, speakers, types, meta)['display_name'])},0,0,0,,"
@@ -739,6 +936,9 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
             end_time = start_time + timedelta(milliseconds=dur_ms if dur_ms > 0 else int(fallback_duration.total_seconds() * 1000))
 
             text_val = strip_outer_quotes(mval)
+            sr = style_render.get(mkey) or {}
+            _maybe_add_bg_event(sr=sr, text=text_val, start=start_time, end=end_time)
+
             line = (
                 f"Dialogue: 1,{format_time(start_time)},{format_time(end_time)},{mkey},"
                 f"{escape_ass_text(get_speaker_style(mkey, speakers, types, meta)['display_name'])},0,0,0,,"
@@ -780,15 +980,18 @@ cps = 15
 [metaTypes.Comment]
 position = top-left
 color = gray
+background = none
 
 ; Speaker types
 [speakerTypes.ATC]
 position = bottom-left
 color = white
+background = none
 
 [speakerTypes.Pilot]
 position = bottom-right
 color = cyan
+background = none
 
 ; Meta tags
 [meta.T]

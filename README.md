@@ -34,6 +34,7 @@ Commands
     - `cps` = characters-per-second (`float`) used to estimate spoken duration when fitting messages between `T` markers.
     - `position` = visual position used when generating styles (examples: `bottom-right`, `top-left`, `middle-center`). Speaker and meta styles inherit this if not overridden.
     - `color` = color for generated ASS styles (named color or hex `#RRGGBB` / `#AARRGGBB`; alpha is ignored).
+    - `background` = background behind subtitles. Accepts `none` or a color (named color / `#RRGGBB` / `#AARRGGBB`). When set to a color, subtitles render with an opaque-box background.
   - Usage:
     - Mandatory `Timestamp` meta type:
       ```ini
@@ -46,10 +47,11 @@ Commands
       [metaTypes.Comment]
       position = top-left
       color = gray
+      background = none
       ```
 
 - `[speakerTypes.<Name>]`
-  - Default visual properties for speakers of the given type (`position`, `color`).
+  - Default visual properties for speakers of the given type (`position`, `color`, `background`).
 
 - `[meta.<Key>]`
   - Can be used in two ways:
@@ -62,10 +64,10 @@ Commands
     [meta.C]
     type = Comment
     ```
-    Assuming a `Comment` meta type is declared earlier, can be used to give a shorthand key and to override `position` and `color`. All meta types that aren't `Timestamp` fall into this category.
+    Assuming a `Comment` meta type is declared earlier, can be used to give a shorthand key and to override `position`, `color` and `background`. All meta types that aren't `Timestamp` fall into this category.
 
 - `[speakers.<KEY>]`
-  - Speaker definitions keyed by stable identifier (used as `ASS` style name). Fields: `name`, `type`, `color` (hex or named color).
+  - Speaker definitions keyed by stable identifier (used as `ASS` style name). Fields: `name`, `type`, `color` (hex or named color), `background` (`none` or a color).
 
 - `[acronyms.<KEY>]`
   - `extension = ...` used to expand acronyms (e.g. FL -> "Flight Level").
