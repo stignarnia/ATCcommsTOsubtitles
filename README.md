@@ -30,6 +30,7 @@ Commands
   - Define reusable "type" settings for meta entries (for example `Timestamp` or `Comment`).
   - Common keys:
     - `format` = timestamp format used to parse `T=` values. Supported tokens: `ss`, `mm:ss`, `hh:mm:ss`. Fractional milliseconds are allowed by appending `.ms` to the value (e.g. `00:12.345`).
+      - Important: ASS/SSA event times are **centiseconds** (`H:MM:SS.cc`), not milliseconds. The compiler accepts millisecond precision on input, but will quantize output to centiseconds to avoid VLC/libass interpreting `.mmm` as centiseconds and creating long overlaps.
     - `cps` = characters-per-second (`float`) used to estimate spoken duration when fitting messages between `T` markers.
     - `position` = visual position used when generating styles (examples: `bottom-right`, `top-left`, `middle-center`). Speaker and meta styles inherit this if not overridden.
     - `color` = color for generated ASS styles (named color or hex `#RRGGBB` / `#AARRGGBB`; alpha is ignored).

@@ -40,12 +40,20 @@ def ass_color(color_value: str) -> str:
         return "&H00FFFFFF"
 
 def format_time(td: timedelta) -> str:
-    """Format a timedelta into ASS time format (H:MM:SS.mmm)."""
-    total_seconds = int(td.total_seconds())
+    """Format a timedelta into ASS/SSA time format (H:MM:SS.cc).
+
+    Note: ASS event timestamps use centiseconds (1/100s), not milliseconds.
+    VLC/libass may misinterpret a `.mmm` suffix as centiseconds, causing large overlaps.
+    """
+    # Work in integer milliseconds to avoid float rounding.
+    total_ms = td.days * 86_400_000 + td.seconds * 1000 + (td.microseconds // 1000)
+
+    total_seconds, ms_remainder = divmod(total_ms, 1000)
     hours, remainder = divmod(total_seconds, 3600)
     minutes, seconds = divmod(remainder, 60)
-    milliseconds = td.microseconds // 1000
-    return f"{hours:01d}:{minutes:02d}:{seconds:02d}.{milliseconds:03d}"
+
+    centiseconds = ms_remainder // 10  # floor to 0..99
+    return f"{hours:01d}:{minutes:02d}:{seconds:02d}.{centiseconds:02d}"
 
 def get_speaker_style(
     speaker_key: str,
@@ -761,7 +769,10 @@ def init_template(name: str = "comms.ini") -> None:
 
     sample = """; Meta types
 [metaTypes.Timestamp]
-; Every combination of hours, minutes, seconds and milliseconds is supported
+; Every combination of hours, minutes, seconds and milliseconds is supported for *input parsing*.
+; Important: ASS/SSA event timestamps are centiseconds (H:MM:SS.cc), not milliseconds. If an ASS file
+; uses ".mmm", VLC/libass can treat that suffix as centiseconds and display events overlapping.
+; This project therefore writes centisecond-precision timestamps to the output ASS.
 format = mm:ss
 ; Characters-per-second used for subtitle duration estimation when fitting lines between T markers
 cps = 15
