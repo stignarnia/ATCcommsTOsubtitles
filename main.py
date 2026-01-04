@@ -15,11 +15,11 @@ def ass_color(color_value: str, *, keep_alpha: bool = False) -> str:
 
     Supports:
       - #RRGGBB
-      - #AARRGGBB (ARGB). Alpha is optionally preserved by setting keep_alpha=True.
+      - #RRGGBBAA (RGBA). Alpha is optionally preserved by setting keep_alpha=True.
       - named colors via `webcolors`
 
     Notes:
-      - ASS alpha is inverted vs. common ARGB notation: 00 = opaque, FF = transparent.
+      - ASS alpha is inverted vs. common RGBA notation: 00 = opaque, FF = transparent.
       - When keep_alpha=False, alpha is always forced to 00 (opaque).
     """
     if not color_value:
@@ -30,13 +30,13 @@ def ass_color(color_value: str, *, keep_alpha: bool = False) -> str:
         hexv = s[1:]
         alpha = "00"
 
-        # ARGB: #AARRGGBB
+        # RGBA: #RRGGBBAA
         if len(hexv) == 8:
-            css_alpha = int(hexv[0:2], 16)
+            css_alpha = int(hexv[6:8], 16)
             if keep_alpha:
                 ass_alpha = 255 - css_alpha
                 alpha = f"{ass_alpha:02X}"
-            hexv = hexv[2:]
+            hexv = hexv[0:6]
 
         if len(hexv) == 6:
             r = int(hexv[0:2], 16)

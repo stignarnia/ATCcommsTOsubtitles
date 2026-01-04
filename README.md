@@ -33,8 +33,8 @@ Commands
       - Important: ASS/SSA event times are **centiseconds** (`H:MM:SS.cc`), not milliseconds. The compiler accepts millisecond precision on input, but will quantize output to centiseconds to avoid VLC/libass interpreting `.mmm` as centiseconds and creating long overlaps.
     - `cps` = characters-per-second (`float`) used to estimate spoken duration when fitting messages between `T` markers.
     - `position` = visual position used when generating styles (examples: `bottom-right`, `top-left`, `middle-center`). Speaker and meta styles inherit this if not overridden.
-    - `color` = color for generated ASS styles (named color or hex `#RRGGBB` / `#AARRGGBB`; alpha is ignored for text, preserved for background boxes).
-    - `background` = background behind subtitles. Accepts `none` or a color (named color / `#RRGGBB` / `#AARRGGBB`). When set to a color, subtitles render with an opaque-box background.
+    - `color` = color for generated ASS styles (named color or hex `#RRGGBB` / `#RRGGBBAA`; alpha is ignored for text, preserved for background boxes).
+    - `background` = background behind subtitles. Accepts `none` or a color (named color / `#RRGGBB` / `#RRGGBBAA`). When set to a color, subtitles render with an opaque-box background.
   - Usage:
     - Mandatory `Timestamp` meta type:
       ```ini
@@ -93,7 +93,7 @@ Timing rules (summary)
 Color handling
 - Supports:
   - `#RRGGBB`
-  - `#AARRGGBB` (alpha ignored for text, preserved for background boxes)
+  - `#RRGGBBAA` (alpha ignored for text, preserved for background boxes)
   - Named colors via the `webcolors` package
 - Converted into ASS color format (`&H00BBGGRR`).
 
