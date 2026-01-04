@@ -35,13 +35,13 @@ Commands
     - `color` = color for generated ASS styles (named color or hex `#RRGGBB` / `#AARRGGBB`; alpha is ignored).
   - Usage:
     - Mandatory `Timestamp` meta type:
-      ```
+      ```ini
       [metaTypes.Timestamp]
       format = mm:ss
       cps = 15
       ```
     - Other meta types (e.g. `Comment`):
-      ```
+      ```ini
       [metaTypes.Comment]
       position = top-left
       color = gray
@@ -52,12 +52,12 @@ Commands
 
 - `[meta.<Key>]`
   - Can be used in two ways:
-    ```
+    ```ini
     [meta.T]
     type = Timestamp
     ```
     To rename the `Timestamp` token to a shorter key like `T` that is easier to type later. You can also have different `Timestamp` objects and override `format` and `cps` in order to have blocks with different timing rules.
-    ```
+    ```ini
     [meta.C]
     type = Comment
     ```

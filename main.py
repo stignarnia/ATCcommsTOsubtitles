@@ -68,11 +68,80 @@ def get_speaker_style(
     speaker_type = speaker_info.get("type")
     type_info = types.get(speaker_type, {})
 
+    # Position normalization is handled separately so callers can map to ASS alignments.
     return {
         "display_name": speaker_info.get("name", speaker_key),
-        "position": type_info.get("position", "Left"),
+        "position": type_info.get("position", "bottom-left"),
         "color": speaker_info.get("color", type_info.get("color", "white")),
     }
+
+def _normalize_position(pos: str | None) -> str:
+    """Normalize a position string into one of the nine canonical tokens:
+    '<vertical>-<horizontal>' where vertical in (top,middle,bottom) and
+    horizontal in (left,center,right). Defaults to 'bottom-left'.
+
+    Rules:
+    - Case-insensitive.
+    - If only a vertical token is provided (top/middle/bottom), assume '-left'.
+    - If only a horizontal token is provided (left/center/right), assume 'bottom-'.
+    """
+    if not pos:
+        return "bottom-left"
+
+    p = pos.strip().lower()
+    p = p.replace("_", "-")
+
+    vertical_map = {"top": "top", "middle": "middle", "center": "middle", "bottom": "bottom"}
+    horizontal_map = {"left": "left", "center": "center", "right": "right", "middle": "center"}
+
+    parts = [part for part in p.split("-") if part]
+    if len(parts) == 1:
+        token = parts[0]
+        # Prefer horizontal tokens (e.g. "center") so that "center" -> "bottom-center".
+        # Fall back to vertical tokens (e.g. "middle") which map to "<vertical>-left".
+        if token in horizontal_map:
+            return f"bottom-{horizontal_map[token]}"
+        if token in vertical_map:
+            return f"{vertical_map[token]}-left"
+        return "bottom-left"
+
+    # Prefer first two parts when more provided
+    v, h = parts[0], parts[1]
+    v = vertical_map.get(v, None)
+    h = horizontal_map.get(h, None)
+    if v and h:
+        return f"{v}-{h}"
+
+    # Try swapping in case order was reversed
+    v2 = vertical_map.get(parts[1], None)
+    h2 = horizontal_map.get(parts[0], None)
+    if v2 and h2:
+        return f"{v2}-{h2}"
+
+    return "bottom-left"
+
+
+def _position_to_alignment(pos: str | None) -> int:
+    """Map normalized position to ASS alignment (1-9).
+
+    ASS alignment mapping:
+      bottom-left=1, bottom-center=2, bottom-righbeht=3,
+      middle-left=4, middle-center=5, middle-right=6,
+      top-left=7, top-center=8, top-right=9
+    """
+    norm = _normalize_position(pos)
+    mapping = {
+        "bottom-left": 1,
+        "bottom-center": 2,
+        "bottom-right": 3,
+        "middle-left": 4,
+        "middle-center": 5,
+        "middle-right": 6,
+        "top-left": 7,
+        "top-center": 8,
+        "top-right": 9,
+    }
+    return mapping.get(norm, 1)
 
 def parse_comms_lines(path: str | None = None, lines: list[str] | None = None) -> list[tuple[str, str]]:
     """
@@ -451,12 +520,8 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
 
         color = ass_color(style["color"])
 
-        # Determine alignment
-        alignment = 1  # Left
-        if style["position"] == "Right":
-            alignment = 3
-        elif style["position"] == "Center":
-            alignment = 2
+        # Determine alignment (map normalized positions to ASS 1-9)
+        alignment = _position_to_alignment(style.get("position"))
 
         ass_file.append(
             f"Style: {speaker_key},Arial,56,{color},&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,{alignment},20,20,20,1"
