@@ -609,6 +609,7 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
     bg_pad_right = 30
 
     width_scale = 0.92  # shrink width a bit vs. the crude units*fontsize mapping
+    bg_corner_r = 18  # rounded corner radius (px) for background boxes
 
     def wrap_metrics(text: str) -> tuple[int, float]:
         """
@@ -833,6 +834,30 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
     # Collect Dialogue lines first, then emit them sorted by start time for robustness.
     pending_events: list[tuple[timedelta, int, str]] = []
 
+    def _rounded_rect_path(width: int, height: int, r: int) -> str:
+        """
+        ASS vector drawing path for a filled rounded rectangle.
+
+        Uses cubic Beziers to approximate quarter-circles (kappa approximation).
+        """
+        r = max(0, min(int(r), int(width // 2), int(height // 2)))
+        if r <= 0:
+            return f"m 0 0 l {width} 0 l {width} {height} l 0 {height} l 0 0"
+
+        k = int(round(r * 0.5522847498))  # circle kappa approximation
+
+        return (
+            f"m {r} 0 "
+            f"l {width - r} 0 "
+            f"b {width - r + k} 0 {width} {r - k} {width} {r} "
+            f"l {width} {height - r} "
+            f"b {width} {height - r + k} {width - r + k} {height} {width - r} {height} "
+            f"l {r} {height} "
+            f"b {r - k} {height} 0 {height - r + k} 0 {height - r} "
+            f"l 0 {r} "
+            f"b 0 {r - k} {r - k} 0 {r} 0"
+        )
+
     def _maybe_add_bg_event(*, sr: dict[str, object], text: str, start: timedelta, end: timedelta) -> None:
         """If the style declares a background, add a rectangle-drawing event behind the text."""
         if not sr.get("has_bg"):
@@ -847,9 +872,11 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
         text_w = estimate_text_core_width_px(text)
         x_left, width = bg_box_x(alignment, text_w)
 
+        path = _rounded_rect_path(width, height, bg_corner_r)
+
         bg_text = (
             f"{{\\p1\\pos({x_left},{y_top})\\an7\\bord0\\shad0\\1c&H{bg_bbggrr}&\\1a&H{bg_alpha}&}}"
-            f"m 0 0 l {width} 0 l {width} {height} l 0 {height}"
+            f"{path}"
             f"{{\\p0}}"
         )
 
