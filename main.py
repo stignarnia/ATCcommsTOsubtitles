@@ -533,7 +533,7 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
     ass_file.append("[Script Info]")
     ass_file.append("Title: Comms Subtitles")
     ass_file.append("ScriptType: v4.00+")
-    ass_file.append("WrapStyle: 0")
+    ass_file.append("WrapStyle: 2")
     ass_file.append("PlayResX: 1920")
     ass_file.append("PlayResY: 1080")
     ass_file.append("")
@@ -604,56 +604,19 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
     bg_line_h = int(font_size * 1.10)  # approx line height at fontsize=56
     bg_pad_y = 8  # vertical padding inside the rectangle (top+bottom)
 
-    # Asymmetric padding: more padding on the right than on the left.
-    bg_pad_left = 10
-    bg_pad_right = 30
+    # Horizontal padding inside the rectangle (left+right).
+    bg_pad_x = 20
 
-    width_scale = 0.92  # shrink width a bit vs. the crude units*fontsize mapping
+    width_scale = 1  # Knob to grow or shrink the box width if it's consistently too small or big
     bg_corner_r = 18  # rounded corner radius (px) for background boxes
 
-    def wrap_metrics(text: str) -> tuple[int, float]:
-        """
-        Return (wrapped_line_count, max_line_units) using a crude word-wrap simulation.
-        - Respects explicit ASS line breaks (\\N).
-        - Approximates word-wrapping using usable width: PlayResX - MarginL - MarginR.
-        """
-        usable_px = max(1, play_res_x - margin_l - margin_r)
-        max_units_per_line = usable_px / max(1, font_size)
-
-        segments = (text or "").replace("\n", "\\N").split("\\N")
-
-        total_lines = 0
-        max_line_units_seen = 0.0
-
-        for seg in segments:
-            words = seg.split()
-            if not words:
-                total_lines += 1
-                continue
-
-            line_units = 0.0
-            for w in words:
-                w_units = sum(_char_width_units(ch) for ch in w)
-                space_units = _char_width_units(" ")
-
-                if line_units <= 0.0:
-                    line_units = w_units
-                else:
-                    if line_units + space_units + w_units <= max_units_per_line:
-                        line_units += space_units + w_units
-                    else:
-                        max_line_units_seen = max(max_line_units_seen, line_units)
-                        total_lines += 1
-                        line_units = w_units
-
-            max_line_units_seen = max(max_line_units_seen, line_units)
-            total_lines += 1
-
-        return max(1, total_lines), max_line_units_seen
-
-    def estimate_box_height_px(text: str) -> int:
-        lines, _max_units = wrap_metrics(text)
-        return (lines * bg_line_h) + (2 * bg_pad_y)
+    # Deterministic wrapping target.
+    # Aim for ~half the screen width so multi-line subtitles are more compact/taller,
+    # and background boxes are more consistent across renderers.
+    usable_px = max(1, play_res_x - margin_l - margin_r)
+    wrap_width_ratio = 0.50
+    target_wrap_px = max(1, int(usable_px * wrap_width_ratio))
+    max_units_per_line = target_wrap_px / max(1, font_size)
 
     def bg_y_top(alignment: int, height: int) -> int:
         # top row: 7,8,9 ; middle row: 4,5,6 ; bottom row: 1,2,3
@@ -664,22 +627,81 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
         return play_res_y - margin_v - height
 
     def _char_width_units(ch: str) -> float:
-        # Very rough per-character width model for Arial-ish proportional fonts.
-        # Tuned down slightly to avoid overly wide boxes.
-        if ch == " ":
-            return 0.25
-        if ch in ".,:;!|'`":
+        # 1. Punctuation (Tiny)
+        if ch in " .,:;!|'`":
             return 0.24
-        if ch in "ilI[]()":
+        if ch in "ilI1[]()":
             return 0.30
-        if ch in "MW@#%":
-            return 0.82
-        return 0.52
 
-    def estimate_text_core_width_px(text: str) -> int:
-        """Approximate width of the rendered text (no padding), accounting for auto-wrapping."""
-        _lines, max_units = wrap_metrics(text)
-        return max(1, int(max_units * font_size * width_scale))
+        # 2. Extra Wide Chars (Safety bump)
+        if ch in "MW@#%":
+            return 0.85
+
+        # 3. Uppercase & Digits (THE FIX)
+        # These are much wider than lowercase. This prevents the box from being too small on X.
+        if ch.isupper() or ch.isdigit():
+            return 0.62 
+
+        # 4. Standard Lowercase
+        # Keeps normal sentences tight.
+        return 0.46
+
+    def wrap_ass_text(text: str) -> tuple[str, int, float]:
+        """
+        Word-wrap the subtitle text deterministically and return:
+
+        - wrapped_text: with explicit ASS line breaks (\\N)
+        - line_count: number of lines in wrapped_text
+        - max_line_units: max line width in "char units" (for background sizing)
+
+        This allows emitting `\\q2` (no auto wrap) and still getting consistent layout
+        across players/renderers.
+        """
+        # Normalize newlines and map them to explicit ASS line breaks.
+        raw = (text or "").replace("\r\n", "\n").replace("\r", "\n").replace("\n", "\\N")
+
+        out_lines: list[str] = []
+        max_units_seen = 0.0
+
+        for seg in raw.split("\\N"):
+            words = seg.split()
+            if not words:
+                out_lines.append("")
+                continue
+
+            current_words: list[str] = []
+            current_units = 0.0
+
+            for w in words:
+                w_units = sum(_char_width_units(ch) for ch in w)
+                space_units = _char_width_units(" ")
+
+                if not current_words:
+                    current_words = [w]
+                    current_units = w_units
+                    continue
+
+                if current_units + space_units + w_units <= max_units_per_line:
+                    current_words.append(w)
+                    current_units += space_units + w_units
+                else:
+                    out_lines.append(" ".join(current_words))
+                    max_units_seen = max(max_units_seen, current_units)
+                    current_words = [w]
+                    current_units = w_units
+
+            out_lines.append(" ".join(current_words))
+            max_units_seen = max(max_units_seen, current_units)
+
+        line_count = max(1, len(out_lines))
+        return "\\N".join(out_lines), line_count, max_units_seen
+
+    def box_height_px(line_count: int) -> int:
+        return (max(1, int(line_count)) * bg_line_h) + (2 * bg_pad_y)
+
+    def text_core_width_px(max_units: float) -> int:
+        """Approximate width of the rendered text core (no padding) from wrapped max units."""
+        return max(1, int(max(0.0, float(max_units)) * font_size * width_scale))
 
     def bg_box_x(alignment: int, text_w: int) -> tuple[int, int]:
         """Return (x_left, box_width) for the background rectangle."""
@@ -694,10 +716,10 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
         text_right = text_left + text_w
 
         # Desired padded rectangle.
-        box_left = text_left - bg_pad_left
-        box_right = text_right + bg_pad_right
+        box_left = text_left - bg_pad_x
+        box_right = text_right + bg_pad_x
 
-        # Clamp within the video frame; if we overflow on the right, shift left (reduces left padding).
+        # Clamp within the video frame; if we overflow on the right, shift left.
         if box_right > play_res_x:
             shift = box_right - play_res_x
             box_left -= shift
@@ -858,7 +880,14 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
             f"b 0 {r - k} {r - k} 0 {r} 0"
         )
 
-    def _maybe_add_bg_event(*, sr: dict[str, object], text: str, start: timedelta, end: timedelta) -> None:
+    def _maybe_add_bg_event(
+        *,
+        sr: dict[str, object],
+        line_count: int,
+        max_line_units: float,
+        start: timedelta,
+        end: timedelta,
+    ) -> None:
         """If the style declares a background, add a rectangle-drawing event behind the text."""
         if not sr.get("has_bg"):
             return
@@ -866,10 +895,10 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
         bg_alpha, bg_bbggrr = split_ass_color(str(sr.get("bg_ass", "&H00000000")))
         alignment = int(sr.get("alignment", 1))
 
-        height = estimate_box_height_px(text)
+        height = box_height_px(line_count)
         y_top = bg_y_top(alignment, height)
 
-        text_w = estimate_text_core_width_px(text)
+        text_w = text_core_width_px(max_line_units)
         x_left, width = bg_box_x(alignment, text_w)
 
         path = _rounded_rect_path(width, height, bg_corner_r)
@@ -945,13 +974,15 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
             end_time = start_time + timedelta(milliseconds=dur_ms if dur_ms > 0 else int(fallback_duration.total_seconds() * 1000))
 
             text_val = strip_outer_quotes(mval)
+            wrapped_text, line_count, max_units = wrap_ass_text(text_val)
+
             sr = style_render.get(mkey) or {}
-            _maybe_add_bg_event(sr=sr, text=text_val, start=start_time, end=end_time)
+            _maybe_add_bg_event(sr=sr, line_count=line_count, max_line_units=max_units, start=start_time, end=end_time)
 
             line = (
                 f"Dialogue: 0,{format_time(start_time)},{format_time(end_time)},{mkey},"
                 f"{escape_ass_text(get_speaker_style(mkey, speakers, types, meta)['display_name'])},0,0,0,,"
-                f"{escape_ass_text(text_val)}"
+                f"{{\\q2}}{escape_ass_text(wrapped_text)}"
             )
             pending_events.append((start_time, 0, line))
             speakers_current = end_time
@@ -963,13 +994,15 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
             end_time = start_time + timedelta(milliseconds=dur_ms if dur_ms > 0 else int(fallback_duration.total_seconds() * 1000))
 
             text_val = strip_outer_quotes(mval)
+            wrapped_text, line_count, max_units = wrap_ass_text(text_val)
+
             sr = style_render.get(mkey) or {}
-            _maybe_add_bg_event(sr=sr, text=text_val, start=start_time, end=end_time)
+            _maybe_add_bg_event(sr=sr, line_count=line_count, max_line_units=max_units, start=start_time, end=end_time)
 
             line = (
                 f"Dialogue: 1,{format_time(start_time)},{format_time(end_time)},{mkey},"
                 f"{escape_ass_text(get_speaker_style(mkey, speakers, types, meta)['display_name'])},0,0,0,,"
-                f"{escape_ass_text(text_val)}"
+                f"{{\\q2}}{escape_ass_text(wrapped_text)}"
             )
             pending_events.append((start_time, 1, line))
             meta_current = end_time

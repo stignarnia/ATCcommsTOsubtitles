@@ -1,7 +1,7 @@
 [Script Info]
 Title: Comms Subtitles
 ScriptType: v4.00+
-WrapStyle: 0
+WrapStyle: 2
 PlayResX: 1920
 PlayResY: 1080
 
@@ -21,88 +21,88 @@ Style: C,Arial,56,&H00808080,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
-Dialogue: 0,0:00:28.00,0:00:36.00,Default,,0,0,0,,{\p1\pos(346,20)\an7\bord0\shad0\1c&HFFFFFF&\1a&H4F&}m 18 0 l 1556 0 b 1566 0 1574 8 1574 18 l 1574 59 b 1574 69 1566 77 1556 77 l 18 77 b 8 77 0 69 0 59 l 0 18 b 0 8 8 0 18 0{\p0}
-Dialogue: 0,0:00:28.00,0:00:33.09,JET,N178QS,0,0,0,,Lisboa Arrival good evening, N178QS, FL250, inbound to LAZET, Information K
-Dialogue: 1,0:00:28.00,0:00:36.00,C,C,0,0,0,,Time: 18:50 UTC on December 30, 2025, ATIS K in effect, QNH 1020 hPa
-Dialogue: 0,0:00:33.09,0:00:43.08,APP,Lisboa Approach,0,0,0,,N178QS, Lisboa Arrival boa tarde, identified. Descend FL80. Proceed direct RULOX, cleared LAZET arrival, expect ILS runway 02. Information K is now current, QNH 1020
-Dialogue: 0,0:00:43.08,0:00:49.99,JET,N178QS,0,0,0,,Descend FL80, QNH 1020, direct RULOX, cleared LAZET arrival, expect ILS runway 02, N178QS
-Dialogue: 0,0:00:50.00,0:00:53.85,DEL,Lisboa Delivery,0,0,0,,delivery exchange for TAP438T
-Dialogue: 0,0:00:53.85,0:00:58.20,GND,Lisboa Ground,0,0,0,,pushback clearance exchange for TAP438T
-Dialogue: 0,0:01:03.00,0:01:05.70,DEL,Lisboa Delivery,0,0,0,,delivery exchange for EZS54LR
-Dialogue: 0,0:01:05.70,0:01:08.90,GND,Lisboa Ground,0,0,0,,pushback clearance exchange for EZS54LR
-Dialogue: 0,0:02:00.00,0:02:04.15,GND,Lisboa Ground,0,0,0,,taxi clearance exchange for TAP438T
-Dialogue: 0,0:02:17.00,0:02:20.00,GND,Lisboa Ground,0,0,0,,taxi clearance exchange for EZS54LR
-Dialogue: 0,0:04:30.00,0:04:33.80,GND,Lisboa Ground,0,0,0,,handoff to tower for TAP438T
-Dialogue: 0,0:04:33.80,0:04:38.10,TWR,Lisboa Tower,0,0,0,,takeoff clearance exchange for TAP438T
-Dialogue: 0,0:04:38.10,0:04:40.75,GND,Lisboa Ground,0,0,0,,handoff to tower for EZS54LR
-Dialogue: 0,0:05:40.00,0:05:43.85,TWR,Lisboa Tower,0,0,0,,line up and wait runway 02 exchange for EZS54LR
-Dialogue: 0,0:06:40.00,0:06:43.15,TWR,Lisboa Tower,0,0,0,,takeoff clearance exchange for EZS54LR
-Dialogue: 0,0:06:56.00,0:07:05.00,Default,,0,0,0,,{\p1\pos(174,20)\an7\bord0\shad0\1c&HFFFFFF&\1a&H4F&}m 18 0 l 1728 0 b 1738 0 1746 8 1746 18 l 1746 181 b 1746 191 1738 199 1728 199 l 18 199 b 8 199 0 191 0 181 l 0 18 b 0 8 8 0 18 0{\p0}
-Dialogue: 0,0:06:56.00,0:06:59.43,TPT,TAP438T,0,0,0,,Lisbon Departure, boa tarde, TAP438T, passing 2,300 feet climbing 4,000 feet, on IXIDA departure
-Dialogue: 1,0:06:56.00,0:07:05.00,C,C,0,0,0,,340 was the planned flight level of TP440 (not TP438 because that one was operated with an A332) on the 30th of december 2025, this information wasn't in the provided simulation file
-Dialogue: 0,0:06:59.43,0:07:02.55,APP,Lisboa Approach,0,0,0,,TAP438T, boa tarde, identified. Climb via SID to FL340, have a safe flight
-Dialogue: 0,0:07:02.55,0:07:04.99,TPT,TAP438T,0,0,0,,Climb via SID to FL340, obrigado TAP438T
-Dialogue: 0,0:07:05.00,0:07:07.95,APP,Lisboa Approach,0,0,0,,N178QS, proceed direct MAZUK
-Dialogue: 0,0:07:07.95,0:07:10.55,JET,N178QS,0,0,0,,Direct MAZUK, N178QS
-Dialogue: 0,0:08:22.00,0:08:25.90,Default,,0,0,0,,{\p1\pos(211,20)\an7\bord0\shad0\1c&HFFFFFF&\1a&H4F&}m 18 0 l 1691 0 b 1701 0 1709 8 1709 18 l 1709 59 b 1709 69 1701 77 1691 77 l 18 77 b 8 77 0 69 0 59 l 0 18 b 0 8 8 0 18 0{\p0}
-Dialogue: 0,0:08:22.00,0:08:29.30,EZS,EZS54LR,0,0,0,,Lisbon Departure, good evening, EZS54LR, passing 1,500 feet climbing 4,000 feet, on IXIDA departure
-Dialogue: 1,0:08:22.00,0:08:25.90,C,C,0,0,0,,I forgot to assume it in the simulation, but this doesn't affect anything
-Dialogue: 0,0:08:25.90,0:08:42.40,Default,,0,0,0,,{\p1\pos(223,20)\an7\bord0\shad0\1c&HFFFFFF&\1a&H4F&}m 18 0 l 1679 0 b 1689 0 1697 8 1697 18 l 1697 242 b 1697 252 1689 260 1679 260 l 18 260 b 8 260 0 252 0 242 l 0 18 b 0 8 8 0 18 0{\p0}
-Dialogue: 1,0:08:25.90,0:08:42.40,C,C,0,0,0,,380 was the planned flight level of U21466 (not U21462 due to timing not lining up with the chosen ATIS, maybe the day of the simulation it was delayed) on the 30th of december 2025, this information wasn't in the provided simulation file
-Dialogue: 0,0:08:29.30,0:08:35.80,APP,Lisboa Approach,0,0,0,,EZS54LR, boa tarde, identified. Climb via SID to FL380, have a safe flight
-Dialogue: 0,0:08:35.80,0:08:40.70,EZS,EZS54LR,0,0,0,,Climb via SID to FL380, thank you EZS54LR
-Dialogue: 0,0:09:36.00,0:09:56.30,Default,,0,0,0,,{\p1\pos(179,20)\an7\bord0\shad0\1c&HFFFFFF&\1a&H4F&}m 18 0 l 1723 0 b 1733 0 1741 8 1741 18 l 1741 303 b 1741 313 1733 321 1723 321 l 18 321 b 8 321 0 313 0 303 l 0 18 b 0 8 8 0 18 0{\p0}
-Dialogue: 0,0:09:36.00,0:09:42.20,LH,DLH97V,0,0,0,,Lisboa Arrival good evening, DLH97V, FL350, inbound to INBOM, Information K
-Dialogue: 1,0:09:36.00,0:09:56.30,C,C,0,0,0,,We override the simulation to put DLH97V still at FL350 like their flight plan says instead of at FL137 descending because it feels like too soon and weird for the en-route to already have cleared the descent when the TMA extends so far north, unlike the western TMA border which is much closer to the airport
-Dialogue: 0,0:09:42.20,0:09:54.25,APP,Lisboa Approach,0,0,0,,DLH97V, Lisboa Arrival boa tarde, identified. For sequencing, proceed direct XAMAX, cleared XAMAX arrival. When ready descend FL80, expect ILS runway 02. QNH 1020.
-Dialogue: 0,0:09:54.25,0:10:03.20,LH,DLH97V,0,0,0,,Direct XAMAX, cleared XAMAX arrival, when ready descend FL80, expect ILS runway 02, QNH 1020, DLH97V
-Dialogue: 0,0:09:56.30,0:10:03.40,Default,,0,0,0,,{\p1\pos(200,20)\an7\bord0\shad0\1c&HFFFFFF&\1a&H4F&}m 18 0 l 1702 0 b 1712 0 1720 8 1720 18 l 1720 120 b 1720 130 1712 138 1702 138 l 18 138 b 8 138 0 130 0 120 l 0 18 b 0 8 8 0 18 0{\p0}
-Dialogue: 1,0:09:56.30,0:10:03.40,C,C,0,0,0,,I forgot to assume it in the simulation, that's why XAMAX becomes orange and then resets to INBOM, then I assume them and do it again
-Dialogue: 0,0:14:05.00,0:14:11.05,APP,Lisboa Approach,0,0,0,,N178QS, proceed direct PESEX, descend 4000 feet, QNH 1020
-Dialogue: 0,0:14:11.05,0:14:16.75,JET,N178QS,0,0,0,,Direct PESEX, descend 4000 feet, QNH 1020, N178QS
-Dialogue: 0,0:15:30.00,0:15:35.95,Default,,0,0,0,,{\p1\pos(202,20)\an7\bord0\shad0\1c&HFFFFFF&\1a&H4F&}m 18 0 l 1700 0 b 1710 0 1718 8 1718 18 l 1718 120 b 1718 130 1710 138 1700 138 l 18 138 b 8 138 0 130 0 120 l 0 18 b 0 8 8 0 18 0{\p0}
-Dialogue: 1,0:15:30.00,0:15:35.95,C,C,0,0,0,,In the simulation I assume EZS54LR but in the communication this actually already happened
-Dialogue: 0,0:15:50.00,0:16:11.50,Default,,0,0,0,,{\p1\pos(179,20)\an7\bord0\shad0\1c&HFFFFFF&\1a&H4F&}m 18 0 l 1723 0 b 1733 0 1741 8 1741 18 l 1741 303 b 1741 313 1733 321 1723 321 l 18 321 b 8 321 0 313 0 303 l 0 18 b 0 8 8 0 18 0{\p0}
-Dialogue: 0,0:15:50.00,0:15:57.35,TPY,TAP43RY,0,0,0,,Lisboa Arrival boa tarde, TAP43RY, FL390, inbound to INBOM, Information K
-Dialogue: 1,0:15:50.00,0:16:11.50,C,C,0,0,0,,We override the simulation to put TAP43RY still at FL390 like their flight plan says instead of at FL145 descending because it feels like too soon and weird for the en-route to already have cleared the descent when the TMA extends so far north, unlike the western TMA border which is much closer to the airport
-Dialogue: 0,0:15:57.35,0:16:10.35,APP,Lisboa Approach,0,0,0,,TAP43RY, Lisboa Arrival boa tarde, identified. When ready descend FL80. Cleared INBOM arrival, expect ILS runway 02. Information K is now current, QNH 1020
-Dialogue: 0,0:16:10.35,0:16:19.85,TPY,TAP43RY,0,0,0,,When ready descend FL80, cleared INBOM arrival, expect ILS runway 02, QNH 1020, TAP43RY
-Dialogue: 0,0:16:45.00,0:17:07.00,Default,,0,0,0,,{\p1\pos(152,20)\an7\bord0\shad0\1c&HFFFFFF&\1a&H4F&}m 18 0 l 1750 0 b 1760 0 1768 8 1768 18 l 1768 364 b 1768 374 1760 382 1750 382 l 18 382 b 8 382 0 374 0 364 l 0 18 b 0 8 8 0 18 0{\p0}
-Dialogue: 1,0:16:45.00,0:17:07.00,C,C,0,0,0,,In the simulation I clear Lufthansa and TAP43RY to FL80 only now, this is because, since I told them to descend when ready, we assume they decided this is their calculated top of descent. This was the only way to make the simulation understand this. The simulation will now make them descend at 1600 fpm but in reality they would use a managed descent and be at FL80 at MAZUK
-Dialogue: 0,0:17:07.00,0:17:21.75,Default,,0,0,0,,{\p1\pos(156,20)\an7\bord0\shad0\1c&HFFFFFF&\1a&H4F&}m 18 0 l 1746 0 b 1756 0 1764 8 1764 18 l 1764 242 b 1764 252 1756 260 1746 260 l 18 260 b 8 260 0 252 0 242 l 0 18 b 0 8 8 0 18 0{\p0}
-Dialogue: 1,0:17:07.00,0:17:21.75,C,C,0,0,0,,In the simulation you see TAP43RY reaching INBOM and continuing on heading 219. This is wrong. In reality, we cleared them for the INBOM arrival so they would turn towards the next waypoint after INBOM which is PT808
-Dialogue: 0,0:17:58.00,0:18:00.60,APP,Lisboa Approach,0,0,0,,DLH97V, proceed direct NATID
-Dialogue: 0,0:18:00.60,0:18:02.85,LH,DLH97V,0,0,0,,Direct NATID, DLH97V
-Dialogue: 0,0:18:02.85,0:18:06.70,APP,Lisboa Approach,0,0,0,,TAP43RY, proceed direct ODLIX
-Dialogue: 0,0:18:06.70,0:18:10.20,TPY,TAP43RY,0,0,0,,Direct ODLIX, TAP43RY
-Dialogue: 0,0:18:20.00,0:18:24.15,APP,Lisboa Approach,0,0,0,,N178QS, cleared ILS approach runway 02
-Dialogue: 0,0:18:24.15,0:18:28.35,JET,N178QS,0,0,0,,Cleared ILS approach runway 02, N178QS
-Dialogue: 0,0:19:45.00,0:19:49.80,APP,Lisboa Approach,0,0,0,,N178QS, contact Lisboa Tower 118.105, tchau
-Dialogue: 0,0:19:49.80,0:19:53.70,JET,N178QS,0,0,0,,118.105, goodbye, N178QS
-Dialogue: 0,0:19:53.70,0:19:57.60,TWR,Lisboa Tower,0,0,0,,the whole tower and ground exchange for N178QS
-Dialogue: 0,0:25:50.00,0:26:01.65,Default,,0,0,0,,{\p1\pos(231,20)\an7\bord0\shad0\1c&HFFFFFF&\1a&H4F&}m 18 0 l 1671 0 b 1681 0 1689 8 1689 18 l 1689 120 b 1689 130 1681 138 1671 138 l 18 138 b 8 138 0 130 0 120 l 0 18 b 0 8 8 0 18 0{\p0}
-Dialogue: 0,0:25:50.00,0:25:56.10,APP,Lisboa Approach,0,0,0,,TAP438T, contact Lisboa Control 132.305, boa viagem
-Dialogue: 1,0:25:50.00,0:26:01.65,C,C,0,0,0,,TAP is being handed off the North Lower Sector of the Lisboa ACC since they are at FL340 and that sector does SFC to FL345
-Dialogue: 0,0:25:56.10,0:26:01.00,TPT,TAP438T,0,0,0,,132.305, obrigado, TAP438T
-Dialogue: 0,0:26:01.00,0:26:06.00,APP,Lisboa Approach,0,0,0,,EZS54LR, contact Lisboa Control 134.855, boa viagem
-Dialogue: 0,0:26:01.65,0:26:12.00,Default,,0,0,0,,{\p1\pos(260,20)\an7\bord0\shad0\1c&HFFFFFF&\1a&H4F&}m 18 0 l 1642 0 b 1652 0 1660 8 1660 18 l 1660 120 b 1660 130 1652 138 1642 138 l 18 138 b 8 138 0 130 0 120 l 0 18 b 0 8 8 0 18 0{\p0}
-Dialogue: 1,0:26:01.65,0:26:12.00,C,C,0,0,0,,Easyjet is being handed off the North Upper Sector of the Lisboa ACC since they are at FL380 and that sector does FL365 to UNL
-Dialogue: 0,0:26:06.00,0:26:09.80,EZS,EZS54LR,0,0,0,,134.855, obrigado, EZS54LR
-Dialogue: 0,0:26:37.00,0:26:46.95,Default,,0,0,0,,{\p1\pos(220,20)\an7\bord0\shad0\1c&HFFFFFF&\1a&H4F&}m 18 0 l 1682 0 b 1692 0 1700 8 1700 18 l 1700 181 b 1700 191 1692 199 1682 199 l 18 199 b 8 199 0 191 0 181 l 0 18 b 0 8 8 0 18 0{\p0}
-Dialogue: 1,0:26:37.00,0:26:46.95,C,C,0,0,0,,In the simulation we make sure the plane is going to MAZUK now that it is almost at NATID, but this doesn't require communication since in reality the pilots would just follow the arrival as cleared
-Dialogue: 0,0:26:50.00,0:26:55.85,APP,Lisboa Approach,0,0,0,,TAP43RY, descend 4000 feet, QNH 1020
-Dialogue: 0,0:26:55.85,0:27:01.75,TPY,TAP43RY,0,0,0,,Descend 4000 feet, QNH 1020, TAP43RY
-Dialogue: 0,0:27:33.00,0:27:36.85,APP,Lisboa Approach,0,0,0,,TAP43RY, proceed direct PESEX
-Dialogue: 0,0:27:36.85,0:27:40.35,TPY,TAP43RY,0,0,0,,Direct PESEX, TAP43RY
-Dialogue: 0,0:29:14.00,0:29:19.05,APP,Lisboa Approach,0,0,0,,TAP43RY, cleared ILS approach runway 02
-Dialogue: 0,0:29:19.05,0:29:24.15,TPY,TAP43RY,0,0,0,,Cleared ILS approach runway 02, TAP43RY
-Dialogue: 0,0:30:25.00,0:30:30.70,APP,Lisboa Approach,0,0,0,,DLH97V, proceed direct PESEX, descend 4000 feet, QNH 1020
-Dialogue: 0,0:30:30.70,0:30:36.05,LH,DLH97V,0,0,0,,Direct PESEX, descend 4000 feet, QNH 1020, DLH97V
-Dialogue: 0,0:30:36.05,0:30:41.75,APP,Lisboa Approach,0,0,0,,TAP43RY, contact Lisboa Tower 118.105, tchau
-Dialogue: 0,0:30:41.75,0:30:46.45,TPY,TAP43RY,0,0,0,,118.105, tchau, TAP43RY
-Dialogue: 0,0:30:46.45,0:30:51.25,TWR,Lisboa Tower,0,0,0,,the whole tower and ground exchange for TAP43RY
-Dialogue: 0,0:33:50.00,0:33:53.80,APP,Lisboa Approach,0,0,0,,DLH97V, cleared ILS approach runway 02
-Dialogue: 0,0:33:53.80,0:33:57.65,LH,DLH97V,0,0,0,,Cleared ILS approach runway 02, DLH97V
-Dialogue: 0,0:35:43.00,0:35:47.45,APP,Lisboa Approach,0,0,0,,DLH97V, contact Lisboa Tower 118.105, tchau
-Dialogue: 0,0:35:47.45,0:35:51.00,LH,DLH97V,0,0,0,,118.105, goodbye, DLH97V
-Dialogue: 0,0:35:51.00,0:35:54.55,TWR,Lisboa Tower,0,0,0,,the whole tower and ground exchange for DLH97V
+Dialogue: 0,0:00:28.00,0:00:36.00,Default,,0,0,0,,{\p1\pos(943,20)\an7\bord0\shad0\1c&HFFFFFF&\1a&H4F&}m 18 0 l 959 0 b 969 0 977 8 977 18 l 977 120 b 977 130 969 138 959 138 l 18 138 b 8 138 0 130 0 120 l 0 18 b 0 8 8 0 18 0{\p0}
+Dialogue: 0,0:00:28.00,0:00:33.09,JET,N178QS,0,0,0,,{\q2}Lisboa Arrival good evening, N178QS,\NFL250, inbound to LAZET, Information\NK
+Dialogue: 1,0:00:28.00,0:00:36.00,C,C,0,0,0,,{\q2}Time: 18:50 UTC on December 30, 2025,\NATIS K in effect, QNH 1020 hPa
+Dialogue: 0,0:00:33.09,0:00:43.08,APP,Lisboa Approach,0,0,0,,{\q2}N178QS, Lisboa Arrival boa tarde,\Nidentified. Descend FL80. Proceed\Ndirect RULOX, cleared LAZET arrival,\Nexpect ILS runway 02. Information K is\Nnow current, QNH 1020
+Dialogue: 0,0:00:43.08,0:00:49.99,JET,N178QS,0,0,0,,{\q2}Descend FL80, QNH 1020, direct\NRULOX, cleared LAZET arrival, expect\NILS runway 02, N178QS
+Dialogue: 0,0:00:50.00,0:00:53.85,DEL,Lisboa Delivery,0,0,0,,{\q2}delivery exchange for TAP438T
+Dialogue: 0,0:00:53.85,0:00:58.20,GND,Lisboa Ground,0,0,0,,{\q2}pushback clearance exchange for\NTAP438T
+Dialogue: 0,0:01:03.00,0:01:05.70,DEL,Lisboa Delivery,0,0,0,,{\q2}delivery exchange for EZS54LR
+Dialogue: 0,0:01:05.70,0:01:08.90,GND,Lisboa Ground,0,0,0,,{\q2}pushback clearance exchange for\NEZS54LR
+Dialogue: 0,0:02:00.00,0:02:04.15,GND,Lisboa Ground,0,0,0,,{\q2}taxi clearance exchange for TAP438T
+Dialogue: 0,0:02:17.00,0:02:20.00,GND,Lisboa Ground,0,0,0,,{\q2}taxi clearance exchange for EZS54LR
+Dialogue: 0,0:04:30.00,0:04:33.80,GND,Lisboa Ground,0,0,0,,{\q2}handoff to tower for TAP438T
+Dialogue: 0,0:04:33.80,0:04:38.10,TWR,Lisboa Tower,0,0,0,,{\q2}takeoff clearance exchange for\NTAP438T
+Dialogue: 0,0:04:38.10,0:04:40.75,GND,Lisboa Ground,0,0,0,,{\q2}handoff to tower for EZS54LR
+Dialogue: 0,0:05:40.00,0:05:43.85,TWR,Lisboa Tower,0,0,0,,{\q2}line up and wait runway 02 exchange for\NEZS54LR
+Dialogue: 0,0:06:40.00,0:06:43.15,TWR,Lisboa Tower,0,0,0,,{\q2}takeoff clearance exchange for\NEZS54LR
+Dialogue: 0,0:06:56.00,0:07:05.00,Default,,0,0,0,,{\p1\pos(952,20)\an7\bord0\shad0\1c&HFFFFFF&\1a&H4F&}m 18 0 l 950 0 b 960 0 968 8 968 18 l 968 303 b 968 313 960 321 950 321 l 18 321 b 8 321 0 313 0 303 l 0 18 b 0 8 8 0 18 0{\p0}
+Dialogue: 0,0:06:56.00,0:06:59.43,TPT,TAP438T,0,0,0,,{\q2}Lisbon Departure, boa tarde, TAP438T,\Npassing 2,300 feet climbing 4,000\Nfeet, on IXIDA departure
+Dialogue: 1,0:06:56.00,0:07:05.00,C,C,0,0,0,,{\q2}340 was the planned flight level of\NTP440 (not TP438 because that one\Nwas operated with an A332) on the 30th\Nof december 2025, this information\Nwasn't in the provided simulation file
+Dialogue: 0,0:06:59.43,0:07:02.55,APP,Lisboa Approach,0,0,0,,{\q2}TAP438T, boa tarde, identified. Climb\Nvia SID to FL340, have a safe flight
+Dialogue: 0,0:07:02.55,0:07:04.99,TPT,TAP438T,0,0,0,,{\q2}Climb via SID to FL340, obrigado\NTAP438T
+Dialogue: 0,0:07:05.00,0:07:07.95,APP,Lisboa Approach,0,0,0,,{\q2}N178QS, proceed direct MAZUK
+Dialogue: 0,0:07:07.95,0:07:10.55,JET,N178QS,0,0,0,,{\q2}Direct MAZUK, N178QS
+Dialogue: 0,0:08:22.00,0:08:25.90,Default,,0,0,0,,{\p1\pos(1002,20)\an7\bord0\shad0\1c&HFFFFFF&\1a&H4F&}m 18 0 l 900 0 b 910 0 918 8 918 18 l 918 120 b 918 130 910 138 900 138 l 18 138 b 8 138 0 130 0 120 l 0 18 b 0 8 8 0 18 0{\p0}
+Dialogue: 0,0:08:22.00,0:08:29.30,EZS,EZS54LR,0,0,0,,{\q2}Lisbon Departure, good evening,\NEZS54LR, passing 1,500 feet climbing\N4,000 feet, on IXIDA departure
+Dialogue: 1,0:08:22.00,0:08:25.90,C,C,0,0,0,,{\q2}I forgot to assume it in the simulation,\Nbut this doesn't affect anything
+Dialogue: 0,0:08:25.90,0:08:42.40,Default,,0,0,0,,{\p1\pos(941,20)\an7\bord0\shad0\1c&HFFFFFF&\1a&H4F&}m 18 0 l 961 0 b 971 0 979 8 979 18 l 979 425 b 979 435 971 443 961 443 l 18 443 b 8 443 0 435 0 425 l 0 18 b 0 8 8 0 18 0{\p0}
+Dialogue: 1,0:08:25.90,0:08:42.40,C,C,0,0,0,,{\q2}380 was the planned flight level of\NU21466 (not U21462 due to timing not\Nlining up with the chosen ATIS, maybe the\Nday of the simulation it was delayed) on\Nthe 30th of december 2025, this\Ninformation wasn't in the provided\Nsimulation file
+Dialogue: 0,0:08:29.30,0:08:35.80,APP,Lisboa Approach,0,0,0,,{\q2}EZS54LR, boa tarde, identified. Climb\Nvia SID to FL380, have a safe flight
+Dialogue: 0,0:08:35.80,0:08:40.70,EZS,EZS54LR,0,0,0,,{\q2}Climb via SID to FL380, thank you\NEZS54LR
+Dialogue: 0,0:09:36.00,0:09:56.30,Default,,0,0,0,,{\p1\pos(943,20)\an7\bord0\shad0\1c&HFFFFFF&\1a&H4F&}m 18 0 l 959 0 b 969 0 977 8 977 18 l 977 547 b 977 557 969 565 959 565 l 18 565 b 8 565 0 557 0 547 l 0 18 b 0 8 8 0 18 0{\p0}
+Dialogue: 0,0:09:36.00,0:09:42.20,LH,DLH97V,0,0,0,,{\q2}Lisboa Arrival good evening, DLH97V,\NFL350, inbound to INBOM, Information\NK
+Dialogue: 1,0:09:36.00,0:09:56.30,C,C,0,0,0,,{\q2}We override the simulation to put\NDLH97V still at FL350 like their\Nflight plan says instead of at FL137\Ndescending because it feels like too soon\Nand weird for the en-route to already\Nhave cleared the descent when the TMA\Nextends so far north, unlike the western\NTMA border which is much closer to the\Nairport
+Dialogue: 0,0:09:42.20,0:09:54.25,APP,Lisboa Approach,0,0,0,,{\q2}DLH97V, Lisboa Arrival boa tarde,\Nidentified. For sequencing, proceed\Ndirect XAMAX, cleared XAMAX arrival.\NWhen ready descend FL80, expect ILS\Nrunway 02. QNH 1020.
+Dialogue: 0,0:09:54.25,0:10:03.20,LH,DLH97V,0,0,0,,{\q2}Direct XAMAX, cleared XAMAX\Narrival, when ready descend FL80,\Nexpect ILS runway 02, QNH 1020,\NDLH97V
+Dialogue: 0,0:09:56.30,0:10:03.40,Default,,0,0,0,,{\p1\pos(995,20)\an7\bord0\shad0\1c&HFFFFFF&\1a&H4F&}m 18 0 l 907 0 b 917 0 925 8 925 18 l 925 242 b 925 252 917 260 907 260 l 18 260 b 8 260 0 252 0 242 l 0 18 b 0 8 8 0 18 0{\p0}
+Dialogue: 1,0:09:56.30,0:10:03.40,C,C,0,0,0,,{\q2}I forgot to assume it in the simulation,\Nthat's why XAMAX becomes orange and\Nthen resets to INBOM, then I assume\Nthem and do it again
+Dialogue: 0,0:14:05.00,0:14:11.05,APP,Lisboa Approach,0,0,0,,{\q2}N178QS, proceed direct PESEX,\Ndescend 4000 feet, QNH 1020
+Dialogue: 0,0:14:11.05,0:14:16.75,JET,N178QS,0,0,0,,{\q2}Direct PESEX, descend 4000 feet,\NQNH 1020, N178QS
+Dialogue: 0,0:15:30.00,0:15:35.95,Default,,0,0,0,,{\p1\pos(958,20)\an7\bord0\shad0\1c&HFFFFFF&\1a&H4F&}m 18 0 l 944 0 b 954 0 962 8 962 18 l 962 181 b 962 191 954 199 944 199 l 18 199 b 8 199 0 191 0 181 l 0 18 b 0 8 8 0 18 0{\p0}
+Dialogue: 1,0:15:30.00,0:15:35.95,C,C,0,0,0,,{\q2}In the simulation I assume EZS54LR but\Nin the communication this actually\Nalready happened
+Dialogue: 0,0:15:50.00,0:16:11.50,Default,,0,0,0,,{\p1\pos(943,20)\an7\bord0\shad0\1c&HFFFFFF&\1a&H4F&}m 18 0 l 959 0 b 969 0 977 8 977 18 l 977 547 b 977 557 969 565 959 565 l 18 565 b 8 565 0 557 0 547 l 0 18 b 0 8 8 0 18 0{\p0}
+Dialogue: 0,0:15:50.00,0:15:57.35,TPY,TAP43RY,0,0,0,,{\q2}Lisboa Arrival boa tarde, TAP43RY,\NFL390, inbound to INBOM, Information\NK
+Dialogue: 1,0:15:50.00,0:16:11.50,C,C,0,0,0,,{\q2}We override the simulation to put\NTAP43RY still at FL390 like their\Nflight plan says instead of at FL145\Ndescending because it feels like too soon\Nand weird for the en-route to already\Nhave cleared the descent when the TMA\Nextends so far north, unlike the western\NTMA border which is much closer to the\Nairport
+Dialogue: 0,0:15:57.35,0:16:10.35,APP,Lisboa Approach,0,0,0,,{\q2}TAP43RY, Lisboa Arrival boa tarde,\Nidentified. When ready descend FL80.\NCleared INBOM arrival, expect ILS\Nrunway 02. Information K is now current,\NQNH 1020
+Dialogue: 0,0:16:10.35,0:16:19.85,TPY,TAP43RY,0,0,0,,{\q2}When ready descend FL80, cleared\NINBOM arrival, expect ILS runway 02,\NQNH 1020, TAP43RY
+Dialogue: 0,0:16:45.00,0:17:07.00,Default,,0,0,0,,{\p1\pos(951,20)\an7\bord0\shad0\1c&HFFFFFF&\1a&H4F&}m 18 0 l 951 0 b 961 0 969 8 969 18 l 969 608 b 969 618 961 626 951 626 l 18 626 b 8 626 0 618 0 608 l 0 18 b 0 8 8 0 18 0{\p0}
+Dialogue: 1,0:16:45.00,0:17:07.00,C,C,0,0,0,,{\q2}In the simulation I clear Lufthansa and\NTAP43RY to FL80 only now, this is\Nbecause, since I told them to descend\Nwhen ready, we assume they decided this\Nis their calculated top of descent. This\Nwas the only way to make the simulation\Nunderstand this. The simulation will now\Nmake them descend at 1600 fpm but in\Nreality they would use a managed descent\Nand be at FL80 at MAZUK
+Dialogue: 0,0:17:07.00,0:17:21.75,Default,,0,0,0,,{\p1\pos(958,20)\an7\bord0\shad0\1c&HFFFFFF&\1a&H4F&}m 18 0 l 944 0 b 954 0 962 8 962 18 l 962 364 b 962 374 954 382 944 382 l 18 382 b 8 382 0 374 0 364 l 0 18 b 0 8 8 0 18 0{\p0}
+Dialogue: 1,0:17:07.00,0:17:21.75,C,C,0,0,0,,{\q2}In the simulation you see TAP43RY\Nreaching INBOM and continuing on\Nheading 219. This is wrong. In reality, we\Ncleared them for the INBOM arrival so\Nthey would turn towards the next\Nwaypoint after INBOM which is PT808
+Dialogue: 0,0:17:58.00,0:18:00.60,APP,Lisboa Approach,0,0,0,,{\q2}DLH97V, proceed direct NATID
+Dialogue: 0,0:18:00.60,0:18:02.85,LH,DLH97V,0,0,0,,{\q2}Direct NATID, DLH97V
+Dialogue: 0,0:18:02.85,0:18:06.70,APP,Lisboa Approach,0,0,0,,{\q2}TAP43RY, proceed direct ODLIX
+Dialogue: 0,0:18:06.70,0:18:10.20,TPY,TAP43RY,0,0,0,,{\q2}Direct ODLIX, TAP43RY
+Dialogue: 0,0:18:20.00,0:18:24.15,APP,Lisboa Approach,0,0,0,,{\q2}N178QS, cleared ILS approach runway\N02
+Dialogue: 0,0:18:24.15,0:18:28.35,JET,N178QS,0,0,0,,{\q2}Cleared ILS approach runway 02,\NN178QS
+Dialogue: 0,0:19:45.00,0:19:49.80,APP,Lisboa Approach,0,0,0,,{\q2}N178QS, contact Lisboa Tower 118.105,\Ntchau
+Dialogue: 0,0:19:49.80,0:19:53.70,JET,N178QS,0,0,0,,{\q2}118.105, goodbye, N178QS
+Dialogue: 0,0:19:53.70,0:19:57.60,TWR,Lisboa Tower,0,0,0,,{\q2}the whole tower and ground exchange for\NN178QS
+Dialogue: 0,0:25:50.00,0:26:01.65,Default,,0,0,0,,{\p1\pos(943,20)\an7\bord0\shad0\1c&HFFFFFF&\1a&H4F&}m 18 0 l 959 0 b 969 0 977 8 977 18 l 977 242 b 977 252 969 260 959 260 l 18 260 b 8 260 0 252 0 242 l 0 18 b 0 8 8 0 18 0{\p0}
+Dialogue: 0,0:25:50.00,0:25:56.10,APP,Lisboa Approach,0,0,0,,{\q2}TAP438T, contact Lisboa Control\N132.305, boa viagem
+Dialogue: 1,0:25:50.00,0:26:01.65,C,C,0,0,0,,{\q2}TAP is being handed off the North\NLower Sector of the Lisboa ACC since\Nthey are at FL340 and that sector does\NSFC to FL345
+Dialogue: 0,0:25:56.10,0:26:01.00,TPT,TAP438T,0,0,0,,{\q2}132.305, obrigado, TAP438T
+Dialogue: 0,0:26:01.00,0:26:06.00,APP,Lisboa Approach,0,0,0,,{\q2}EZS54LR, contact Lisboa Control\N134.855, boa viagem
+Dialogue: 0,0:26:01.65,0:26:12.00,Default,,0,0,0,,{\p1\pos(943,20)\an7\bord0\shad0\1c&HFFFFFF&\1a&H4F&}m 18 0 l 959 0 b 969 0 977 8 977 18 l 977 242 b 977 252 969 260 959 260 l 18 260 b 8 260 0 252 0 242 l 0 18 b 0 8 8 0 18 0{\p0}
+Dialogue: 1,0:26:01.65,0:26:12.00,C,C,0,0,0,,{\q2}Easyjet is being handed off the North\NUpper Sector of the Lisboa ACC since\Nthey are at FL380 and that sector does\NFL365 to UNL
+Dialogue: 0,0:26:06.00,0:26:09.80,EZS,EZS54LR,0,0,0,,{\q2}134.855, obrigado, EZS54LR
+Dialogue: 0,0:26:37.00,0:26:46.95,Default,,0,0,0,,{\p1\pos(958,20)\an7\bord0\shad0\1c&HFFFFFF&\1a&H4F&}m 18 0 l 944 0 b 954 0 962 8 962 18 l 962 303 b 962 313 954 321 944 321 l 18 321 b 8 321 0 313 0 303 l 0 18 b 0 8 8 0 18 0{\p0}
+Dialogue: 1,0:26:37.00,0:26:46.95,C,C,0,0,0,,{\q2}In the simulation we make sure the plane\Nis going to MAZUK now that it is almost\Nat NATID, but this doesn't require\Ncommunication since in reality the pilots\Nwould just follow the arrival as cleared
+Dialogue: 0,0:26:50.00,0:26:55.85,APP,Lisboa Approach,0,0,0,,{\q2}TAP43RY, descend 4000 feet, QNH\N1020
+Dialogue: 0,0:26:55.85,0:27:01.75,TPY,TAP43RY,0,0,0,,{\q2}Descend 4000 feet, QNH 1020,\NTAP43RY
+Dialogue: 0,0:27:33.00,0:27:36.85,APP,Lisboa Approach,0,0,0,,{\q2}TAP43RY, proceed direct PESEX
+Dialogue: 0,0:27:36.85,0:27:40.35,TPY,TAP43RY,0,0,0,,{\q2}Direct PESEX, TAP43RY
+Dialogue: 0,0:29:14.00,0:29:19.05,APP,Lisboa Approach,0,0,0,,{\q2}TAP43RY, cleared ILS approach runway\N02
+Dialogue: 0,0:29:19.05,0:29:24.15,TPY,TAP43RY,0,0,0,,{\q2}Cleared ILS approach runway 02,\NTAP43RY
+Dialogue: 0,0:30:25.00,0:30:30.70,APP,Lisboa Approach,0,0,0,,{\q2}DLH97V, proceed direct PESEX,\Ndescend 4000 feet, QNH 1020
+Dialogue: 0,0:30:30.70,0:30:36.05,LH,DLH97V,0,0,0,,{\q2}Direct PESEX, descend 4000 feet,\NQNH 1020, DLH97V
+Dialogue: 0,0:30:36.05,0:30:41.75,APP,Lisboa Approach,0,0,0,,{\q2}TAP43RY, contact Lisboa Tower\N118.105, tchau
+Dialogue: 0,0:30:41.75,0:30:46.45,TPY,TAP43RY,0,0,0,,{\q2}118.105, tchau, TAP43RY
+Dialogue: 0,0:30:46.45,0:30:51.25,TWR,Lisboa Tower,0,0,0,,{\q2}the whole tower and ground exchange for\NTAP43RY
+Dialogue: 0,0:33:50.00,0:33:53.80,APP,Lisboa Approach,0,0,0,,{\q2}DLH97V, cleared ILS approach runway\N02
+Dialogue: 0,0:33:53.80,0:33:57.65,LH,DLH97V,0,0,0,,{\q2}Cleared ILS approach runway 02,\NDLH97V
+Dialogue: 0,0:35:43.00,0:35:47.45,APP,Lisboa Approach,0,0,0,,{\q2}DLH97V, contact Lisboa Tower 118.105,\Ntchau
+Dialogue: 0,0:35:47.45,0:35:51.00,LH,DLH97V,0,0,0,,{\q2}118.105, goodbye, DLH97V
+Dialogue: 0,0:35:51.00,0:35:54.55,TWR,Lisboa Tower,0,0,0,,{\q2}the whole tower and ground exchange for\NDLH97V

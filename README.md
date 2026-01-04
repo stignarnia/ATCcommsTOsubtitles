@@ -6,6 +6,7 @@ Highlights
 - Keeps `[comms]` entries in order and supports repeated keys (multiple messages per speaker).
 - Estimates spoken durations using configurable characters-per-second, NATO alphabet expansion, acronym expansions and waypoint exceptions.
 - Generates `ASS` styles per speaker and additional elements on screen; supports simple color names and hex colors.
+- Deterministic wrapping: the compiler inserts explicit `\N` line breaks and emits `{\q2}` (no renderer auto-wrap) so line counts are known and consistent across players.
 - Includes an `init` command to scaffold a working example `INI`.
 
 Prerequisites
@@ -89,6 +90,12 @@ Timing rules (summary)
   - ALL-UPPERCASE tokens (`A-Z0-9`) are expanded to NATO letter names unless listed in waypoints.
   - Digits are counted as spoken words (e.g. "2" → "two").
   - `cps` (characters-per-second) from the timestamp meta type controls conversion to duration.
+
+Wrapping rules (summary)
+- The compiler wraps text itself (rather than relying on the subtitle renderer):
+  - It inserts explicit ASS line breaks (`\N`).
+  - It prepends `{\q2}` to each event so the renderer does not re-wrap lines.
+- Wrapping is intentionally aggressive: it targets roughly half the usable screen width to produce taller, more readable blocks and predictable background box sizing.
 
 Color handling
 - Supports:
