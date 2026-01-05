@@ -7,6 +7,7 @@ Highlights
 - Estimates spoken durations using configurable characters-per-second, NATO alphabet expansion, acronym expansions and waypoint exceptions.
 - Generates `ASS` styles per speaker and additional elements on screen; supports simple color names and hex colors.
 - Deterministic wrapping: the compiler inserts explicit `\N` line breaks and emits `{\q2}` (no renderer auto-wrap) so line counts are known and consistent across players.
+- Speaker IDs mentioned inside message text are substituted with that speaker’s display name before timing + rendering (see `src/visual_substitution.py`).
 - Includes an `init` command to scaffold a working example `INI`.
 
 Prerequisites

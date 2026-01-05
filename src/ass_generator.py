@@ -8,11 +8,11 @@ from ini_parsing import (
     load_waypoints,
     parse_comms_lines,
     parse_ini_non_comms,
-    strip_outer_quotes,
 )
 from speech_estimation import estimate_duration
 from style import get_speaker_style, position_to_alignment
 from timestamp import parse_timestamp_to_timedelta
+from visual_substitution import apply_visual_substitutions
 
 def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") -> None:
     # Parse non-[comms] sections normally, but parse [comms] manually to preserve
@@ -300,6 +300,16 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
 
     marker_indices = {midx for midx, _t, _c in markers}
 
+    # One-time visual substitution pass (single entrypoint):
+    # This prepares comms lines for both CPS/duration estimation and final ASS rendering.
+    comms_lines_prepared = apply_visual_substitutions(
+        comms_lines=comms_lines,
+        marker_indices=marker_indices,
+        speakers=speakers,
+        types=types,
+        meta=meta,
+    )
+
     # Helper: find the next marker time after a given index
     def next_marker_time(after_idx: int):
         for midx, t, _ in markers:
@@ -309,7 +319,7 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
 
     # Validate comms speaker keys early (ignore timestamp markers).
     known_speakers = set(speakers.keys()) | (set(meta.keys()) - timestamp_meta_keys)
-    for idx, (k, _v) in enumerate(comms_lines):
+    for idx, (k, _v) in enumerate(comms_lines_prepared):
         if idx in marker_indices:
             continue
         if k not in known_speakers:
@@ -419,7 +429,7 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
         pending_events.append((start, -1, bg_line))
 
     i = 0
-    while i < len(comms_lines):
+    while i < len(comms_lines_prepared):
         if i not in markers_by_index:
             # Disallow implicit timing without a preceding timestamp marker.
             raise ValueError("First [comms] entry must be a timestamp marker (e.g. T=...).")
@@ -432,8 +442,8 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
         # Collect messages until next timestamp marker (or EOF)
         j = i + 1
         block_msgs: list[tuple[str, str]] = []
-        while j < len(comms_lines) and j not in marker_indices:
-            block_msgs.append(comms_lines[j])
+        while j < len(comms_lines_prepared) and j not in marker_indices:
+            block_msgs.append(comms_lines_prepared[j])
             j += 1
 
         if not block_msgs:
@@ -480,7 +490,7 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
                 milliseconds=dur_ms if dur_ms > 0 else int(fallback_duration.total_seconds() * 1000)
             )
 
-            text_val = strip_outer_quotes(mval)
+            text_val = mval
             wrapped_text, line_count, max_units = wrap_ass_text(text_val)
 
             sr = style_render.get(mkey) or {}
@@ -508,7 +518,7 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
                 milliseconds=dur_ms if dur_ms > 0 else int(fallback_duration.total_seconds() * 1000)
             )
 
-            text_val = strip_outer_quotes(mval)
+            text_val = mval
             wrapped_text, line_count, max_units = wrap_ass_text(text_val)
 
             sr = style_render.get(mkey) or {}

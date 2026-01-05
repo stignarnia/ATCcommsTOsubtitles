@@ -1,6 +1,5 @@
 import os
 
-
 def init_template(name: str = "comms.ini") -> None:
     """Create a starter INI file at `name` if it doesn't exist."""
     if os.path.exists(name):
