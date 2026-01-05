@@ -133,10 +133,9 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
     bg_corner_r = 18  # rounded corner radius (px) for background boxes
 
     # Deterministic wrapping target.
-    # Aim for ~half the screen width so multi-line subtitles are more compact/taller,
-    # and background boxes are more consistent across renderers.
+    # Aim for ~3/4 the screen width so lines fill more of the frame before wrapping.
     usable_px = max(1, play_res_x - margin_l - margin_r)
-    wrap_width_ratio = 0.50
+    wrap_width_ratio = 0.75
     target_wrap_px = max(1, int(usable_px * wrap_width_ratio))
     max_units_per_line = target_wrap_px / max(1, font_size)
 
