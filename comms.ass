@@ -17,7 +17,8 @@ Style: TPY,Arial,56,&H00008000,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,
 Style: JET,Arial,56,&H00FFFF00,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,3,20,20,20,1
 Style: EZS,Arial,56,&H0000A5FF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,3,20,20,20,1
 Style: TPT,Arial,56,&H0000FFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,3,20,20,20,1
-Style: C,Arial,56,&H00808080,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,9,20,20,20,1
+Style: C,Arial,56,&H00000000,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,9,20,20,20,1
+Style: M,Arial,56,&H00000000,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,9,20,20,20,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -26,29 +27,38 @@ Dialogue: 0,0:00:28.00,0:00:33.09,JET,N178QS,0,0,0,,{\q2}Lisboa Arrival good eve
 Dialogue: 1,0:00:28.00,0:00:36.00,C,C,0,0,0,,{\q2}Time: 18:50 UTC on December 30, 2025,\NATIS K in effect, QNH 1020 hPa
 Dialogue: 0,0:00:33.09,0:00:43.08,APP,Lisboa Approach,0,0,0,,{\q2}N178QS, Lisboa Arrival boa tarde,\Nidentified. Descend FL80. Proceed\Ndirect RULOX, cleared LAZET arrival,\Nexpect ILS runway 02. Information K is\Nnow current, QNH 1020
 Dialogue: 0,0:00:43.08,0:00:49.99,JET,N178QS,0,0,0,,{\q2}Descend FL80, QNH 1020, direct\NRULOX, cleared LAZET arrival, expect\NILS runway 02, N178QS
-Dialogue: 0,0:00:50.00,0:00:51.28,TPT,TAP438T,0,0,0,,{\q2}Lisbon Delivery, boa tarde, TAP438T,\Nstand ---, information K, ready to copy
-Dialogue: 0,0:00:51.28,0:00:54.26,DEL,Lisboa Delivery,0,0,0,,{\q2}TAP438T, boa tarde, Lisboa Delivery,\Ninformation K is current, QNH 1020.\NRunway 02 in use. Cleared to Paris Orly\Nas filed. Expect departure via IXIDA\NSID. Squawk ---. Initial climb to 4000\Nfeet.
-Dialogue: 0,0:00:54.26,0:00:56.42,TPT,TAP438T,0,0,0,,{\q2}QNH 1020. Cleared to Paris Orly as\Nfiled. Expect departure via IXIDA SID.\NSquawk ---. Initial climb to 4000 feet,\NTAP438T
-Dialogue: 0,0:00:56.42,0:00:57.70,DEL,Lisboa Delivery,0,0,0,,{\q2}TAP438T, readback correct, when\Nready contact Lisboa Ground on ---, boa\Nviagem
-Dialogue: 0,0:00:57.70,0:00:58.68,TPT,TAP438T,0,0,0,,{\q2}Contact Lisboa Ground on ---, obrigado,\NTAP438T
-Dialogue: 0,0:00:58.68,0:00:59.92,TPT,TAP438T,0,0,0,,{\q2}Lisbon Ground, boa tarde, TAP438T,\Nstand ---, request pushback and startup
-Dialogue: 0,0:00:59.92,0:01:01.46,GND,Lisboa Ground,0,0,0,,{\q2}TAP438T, boa tarde, pushback and\Nstartup approved, facing north. Expect\Ntaxi via --- to runway 02.
-Dialogue: 0,0:01:01.46,0:01:02.99,TPT,TAP438T,0,0,0,,{\q2}Pushback and startup approved, facing\Nnorth. Expect taxi via --- to runway 02,\Nobrigado, TAP438T
-Dialogue: 0,0:01:03.00,0:01:08.35,EZS,EZS54LR,0,0,0,,{\q2}Lisbon Delivery, good afternoon,\NEZS54LR, stand ---, information K,\Nready to copy
-Dialogue: 0,0:01:08.35,0:01:21.50,DEL,Lisboa Delivery,0,0,0,,{\q2}EZS54LR, boa tarde, Lisboa Delivery,\Ninformation K is current, QNH 1020.\NRunway 02 in use. Cleared to Geneva as\Nfiled. Expect departure via IXIDA SID.\NSquawk ---. Initial climb to 4000 feet.
-Dialogue: 0,0:01:21.50,0:01:30.65,EZS,EZS54LR,0,0,0,,{\q2}QNH 1020. Cleared to Geneva as filed.\NExpect departure via IXIDA SID. Squawk\N---. Initial climb to 4000 feet,\NEZS54LR
-Dialogue: 0,0:01:30.65,0:01:35.75,DEL,Lisboa Delivery,0,0,0,,{\q2}EZS54LR, readback correct, when\Nready contact Lisboa Ground on ---, boa\Nviagem
-Dialogue: 0,0:01:35.75,0:01:39.35,EZS,EZS54LR,0,0,0,,{\q2}Contact Lisboa Ground on ---, obrigado,\NEZS54LR
-Dialogue: 0,0:01:39.35,0:01:44.25,EZS,EZS54LR,0,0,0,,{\q2}Lisbon Ground, boa tarde, EZS54LR,\Nstand ---, request pushback and startup
-Dialogue: 0,0:01:44.25,0:01:50.60,GND,Lisboa Ground,0,0,0,,{\q2}EZS54LR, boa tarde, pushback and\Nstartup approved, facing north. Expect\Ntaxi via --- to runway 02.
-Dialogue: 0,0:01:50.60,0:01:56.90,EZS,EZS54LR,0,0,0,,{\q2}Pushback and startup approved, facing\Nnorth. Expect taxi via --- to runway 02,\Nobrigado, EZS54LR
-Dialogue: 0,0:02:00.00,0:02:04.15,GND,Lisboa Ground,0,0,0,,{\q2}taxi clearance exchange for TAP438T
-Dialogue: 0,0:02:17.00,0:02:20.00,GND,Lisboa Ground,0,0,0,,{\q2}taxi clearance exchange for EZS54LR
+Dialogue: 0,0:00:50.00,0:00:51.18,TPT,TAP438T,0,0,0,,{\q2}Lisbon Delivery, boa tarde, TAP438T,\Nstand 124, information K, ready to copy
+Dialogue: 0,0:00:51.18,0:00:53.91,DEL,Lisboa Delivery,0,0,0,,{\q2}TAP438T, boa tarde, Lisboa Delivery,\Ninformation K is current, QNH 1020.\NRunway 02 in use. Cleared to Paris Orly\Nas filed. Expect departure via IXIDA\NSID. Squawk 4314. Initial climb to 4000\Nfeet.
+Dialogue: 0,0:00:53.91,0:00:55.92,TPT,TAP438T,0,0,0,,{\q2}QNH 1020. Cleared to Paris Orly as\Nfiled. Expect departure via IXIDA SID.\NSquawk 4314. Initial climb to 4000\Nfeet, TAP438T
+Dialogue: 0,0:00:55.92,0:00:57.28,DEL,Lisboa Delivery,0,0,0,,{\q2}TAP438T, readback correct, when\Nready contact Lisboa Ground on\N121.755, boa viagem
+Dialogue: 0,0:00:57.28,0:00:58.37,TPT,TAP438T,0,0,0,,{\q2}Contact Lisboa Ground on 121.755,\Nobrigado, TAP438T
+Dialogue: 0,0:00:58.37,0:00:59.53,TPT,TAP438T,0,0,0,,{\q2}Lisbon Ground, boa tarde, TAP438T,\Nstand 124, request pushback and startup
+Dialogue: 0,0:00:59.53,0:01:01.32,GND,Lisboa Ground,0,0,0,,{\q2}TAP438T, boa tarde, identified,\Npushback and startup approved, facing\Nnorth. Expect taxi via A3, G, U1, N2 to\Nrunway 02.
+Dialogue: 0,0:01:01.32,0:01:02.99,TPT,TAP438T,0,0,0,,{\q2}Pushback and startup approved, facing\Nnorth. Expect taxi via A3, G, U1, N2 to\Nrunway 02, obrigado, TAP438T
+Dialogue: 0,0:01:03.00,0:01:08.37,EZS,EZS54LR,0,0,0,,{\q2}Lisbon Delivery, good afternoon,\NEZS54LR, stand 115, information K,\Nready to copy
+Dialogue: 0,0:01:08.37,0:01:21.49,DEL,Lisboa Delivery,0,0,0,,{\q2}EZS54LR, boa tarde, Lisboa Delivery,\Ninformation K is current, QNH 1020.\NRunway 02 in use. Cleared to Geneva as\Nfiled. Expect departure via IXIDA SID.\NSquawk 4309. Initial climb to 4000\Nfeet.
+Dialogue: 0,0:01:21.49,0:01:30.83,EZS,EZS54LR,0,0,0,,{\q2}QNH 1020. Cleared to Geneva as filed.\NExpect departure via IXIDA SID. Squawk\N4309. Initial climb to 4000 feet,\NEZS54LR
+Dialogue: 0,0:01:30.83,0:01:36.87,DEL,Lisboa Delivery,0,0,0,,{\q2}EZS54LR, readback correct, when\Nready contact Lisboa Ground on\N121.755, boa viagem
+Dialogue: 0,0:01:36.87,0:01:41.50,EZS,EZS54LR,0,0,0,,{\q2}Contact Lisboa Ground on 121.755,\Nobrigado, EZS54LR
+Dialogue: 0,0:01:41.50,0:01:46.45,EZS,EZS54LR,0,0,0,,{\q2}Lisbon Ground, boa tarde, EZS54LR,\Nstand 115, request pushback and startup
+Dialogue: 0,0:01:46.45,0:01:53.53,GND,Lisboa Ground,0,0,0,,{\q2}EZS54LR, boa tarde, identified,\Npushback and startup approved, facing\Nsouth. Expect taxi via A2, M to runway\N02.
+Dialogue: 0,0:01:53.53,0:01:59.99,EZS,EZS54LR,0,0,0,,{\q2}Pushback and startup approved, facing\Nsouth. Expect taxi via A2, M to runway\N02, obrigado, EZS54LR
+Dialogue: 0,0:02:00.00,0:02:02.98,TPT,TAP438T,0,0,0,,{\q2}Lisbon Ground, TAP438T, ready to taxi
+Dialogue: 0,0:02:02.98,0:02:09.97,GND,Lisboa Ground,0,0,0,,{\q2}TAP438T, taxi to runway 02 via A3, G,\NU1, N2, hold short runway 02. Monitor\Ntower on 118.105
+Dialogue: 0,0:02:09.97,0:02:16.99,TPT,TAP438T,0,0,0,,{\q2}Taxi to runway 02 via A3, G, U1, N2,\Nhold short runway 02. Monitor tower on\N118.105, TAP438T
+Dialogue: 0,0:02:17.00,0:02:20.05,EZS,EZS54LR,0,0,0,,{\q2}Lisbon Ground, EZS54LR, ready to taxi
+Dialogue: 0,0:02:20.05,0:02:27.45,GND,Lisboa Ground,0,0,0,,{\q2}EZS54LR, taxi to runway 02 via A2, M,\Nhold short runway 02. Monitor tower on\N118.105
+Dialogue: 0,0:02:27.45,0:02:34.90,EZS,EZS54LR,0,0,0,,{\q2}Taxi to runway 02 via A2, M, hold short\Nrunway 02. Monitor tower on 118.105,\NEZS54LR
 Dialogue: 0,0:04:30.00,0:04:33.80,GND,Lisboa Ground,0,0,0,,{\q2}handoff to tower for TAP438T
-Dialogue: 0,0:04:33.80,0:04:38.10,TWR,Lisboa Tower,0,0,0,,{\q2}takeoff clearance exchange for\NTAP438T
-Dialogue: 0,0:04:38.10,0:04:40.75,GND,Lisboa Ground,0,0,0,,{\q2}handoff to tower for EZS54LR
-Dialogue: 0,0:05:40.00,0:05:43.85,TWR,Lisboa Tower,0,0,0,,{\q2}line up and wait runway 02 exchange for\NEZS54LR
-Dialogue: 0,0:06:40.00,0:06:43.15,TWR,Lisboa Tower,0,0,0,,{\q2}takeoff clearance exchange for\NEZS54LR
+Dialogue: 0,0:04:33.80,0:04:39.55,TPT,TAP438T,0,0,0,,{\q2}Lisbon Tower, boa tarde, TAP438T,\Nready for departure runway 02
+Dialogue: 0,0:04:39.55,0:04:52.35,TWR,Lisboa Tower,0,0,0,,{\q2}TAP438T, boa tarde, wind 030 degrees,\N4 knots, runway 02 cleared for takeoff.\NInitial climb to 4000 feet, after\Ndeparture contact Lisboa Departure on\N119.105
+Dialogue: 0,0:04:52.35,0:05:03.15,TPT,TAP438T,0,0,0,,{\q2}Runway 02 cleared for takeoff. Initial\Nclimb to 4000 feet, after departure\Ncontact Lisboa Departure on 119.105,\Nobrigado, TAP438T
+Dialogue: 0,0:05:03.15,0:05:05.80,GND,Lisboa Ground,0,0,0,,{\q2}handoff to tower for EZS54LR
+Dialogue: 0,0:05:40.00,0:05:44.85,EZS,EZS54LR,0,0,0,,{\q2}Lisbon Tower, good afternoon,\NEZS54LR, ready for departure runway\N02
+Dialogue: 0,0:05:44.85,0:05:52.85,TWR,Lisboa Tower,0,0,0,,{\q2}EZS54LR, boa tarde, wind 030 degrees,\N4 knots, line up and wait behind TAP\NAirbus runway 02
+Dialogue: 0,0:05:52.85,0:05:58.35,EZS,EZS54LR,0,0,0,,{\q2}Line up and wait behind TAP Airbus\Nrunway 02, EZS54LR
+Dialogue: 0,0:06:40.00,0:06:47.74,TWR,Lisboa Tower,0,0,0,,{\q2}EZS54LR, runway 02 cleared for\Ntakeoff. Initial climb to 4000 feet,\Nafter departure contact Lisboa\NDeparture on 119.105
+Dialogue: 0,0:06:47.74,0:06:55.99,EZS,EZS54LR,0,0,0,,{\q2}Runway 02 cleared for takeoff. Initial\Nclimb to 4000 feet, after departure\Ncontact Lisboa Departure on 119.105,\Nthank you, EZS54LR
 Dialogue: 0,0:06:56.00,0:07:05.00,Default,,0,0,0,,{\p1\pos(952,20)\an7\bord0\shad0\1c&HFFFFFF&\1a&H4F&}m 18 0 l 950 0 b 960 0 968 8 968 18 l 968 303 b 968 313 960 321 950 321 l 18 321 b 8 321 0 313 0 303 l 0 18 b 0 8 8 0 18 0{\p0}
 Dialogue: 0,0:06:56.00,0:06:59.43,TPT,TAP438T,0,0,0,,{\q2}Lisbon Departure, boa tarde, TAP438T,\Npassing 2,300 feet climbing 4,000\Nfeet, on IXIDA departure
 Dialogue: 1,0:06:56.00,0:07:05.00,C,C,0,0,0,,{\q2}340 was the planned flight level of\NTP440 (not TP438 because that one\Nwas operated with an A332) on the 30th\Nof december 2025, this information\Nwasn't in the provided simulation file
@@ -91,14 +101,19 @@ Dialogue: 0,0:18:20.00,0:18:24.15,APP,Lisboa Approach,0,0,0,,{\q2}N178QS, cleare
 Dialogue: 0,0:18:24.15,0:18:28.35,JET,N178QS,0,0,0,,{\q2}Cleared ILS approach runway 02,\NN178QS
 Dialogue: 0,0:19:45.00,0:19:49.80,APP,Lisboa Approach,0,0,0,,{\q2}N178QS, contact Lisboa Tower 118.105,\Ntchau
 Dialogue: 0,0:19:49.80,0:19:53.70,JET,N178QS,0,0,0,,{\q2}118.105, goodbye, N178QS
-Dialogue: 0,0:19:53.70,0:19:57.60,TWR,Lisboa Tower,0,0,0,,{\q2}the whole tower and ground exchange for\NN178QS
-Dialogue: 0,0:25:50.00,0:26:01.65,Default,,0,0,0,,{\p1\pos(943,20)\an7\bord0\shad0\1c&HFFFFFF&\1a&H4F&}m 18 0 l 959 0 b 969 0 977 8 977 18 l 977 242 b 977 252 969 260 959 260 l 18 260 b 8 260 0 252 0 242 l 0 18 b 0 8 8 0 18 0{\p0}
+Dialogue: 0,0:19:53.70,0:19:58.40,JET,N178QS,0,0,0,,{\q2}Lisbon Tower, good evening, N178QS, on\Nfinal for runway 02
+Dialogue: 0,0:19:58.40,0:20:09.70,TWR,Lisboa Tower,0,0,0,,{\q2}N178QS, boa tarde, identified, wind 030\Ndegrees, 4 knots, runway 02 cleared to\Nland. Vacate via H4 if able. Contact\Nground on 118.105 after arrival
+Dialogue: 0,0:20:09.70,0:20:18.30,JET,N178QS,0,0,0,,{\q2}Runway 02 cleared to land, vacate via\NH4 if able. Contact ground on 118.105\Nafter arrival, thanks, N178QS
+Dialogue: 0,0:24:16.00,0:24:23.00,JET,N178QS,0,0,0,,{\q2}Lisbon Ground, good evening, N178QS,\Nvacated runway 02 on H4, request taxi\Nto stand 705
+Dialogue: 0,0:24:23.00,0:24:29.75,GND,Lisboa Ground,0,0,0,,{\q2}N178QS, boa tarde, identified, taxi to\Nstand 705 via U4, A5, W1, D
+Dialogue: 0,0:24:29.75,0:24:35.75,JET,N178QS,0,0,0,,{\q2}Taxi to stand 705 via U4, A5, W1, D,\Nthanks, N178QS
+Dialogue: 0,0:25:50.00,0:26:01.80,Default,,0,0,0,,{\p1\pos(943,20)\an7\bord0\shad0\1c&HFFFFFF&\1a&H4F&}m 18 0 l 959 0 b 969 0 977 8 977 18 l 977 242 b 977 252 969 260 959 260 l 18 260 b 8 260 0 252 0 242 l 0 18 b 0 8 8 0 18 0{\p0}
 Dialogue: 0,0:25:50.00,0:25:56.10,APP,Lisboa Approach,0,0,0,,{\q2}TAP438T, contact Lisboa Control\N132.305, boa viagem
-Dialogue: 1,0:25:50.00,0:26:01.65,C,C,0,0,0,,{\q2}TAP is being handed off the North\NLower Sector of the Lisboa ACC since\Nthey are at FL340 and that sector does\NSFC to FL345
+Dialogue: 1,0:25:50.00,0:26:01.80,C,C,0,0,0,,{\q2}TAP is being handed off to the North\NLower Sector of the Lisboa ACC since\Nthey are at FL340 and that sector does\NSFC to FL345
 Dialogue: 0,0:25:56.10,0:26:01.00,TPT,TAP438T,0,0,0,,{\q2}132.305, obrigado, TAP438T
 Dialogue: 0,0:26:01.00,0:26:06.00,APP,Lisboa Approach,0,0,0,,{\q2}EZS54LR, contact Lisboa Control\N134.855, boa viagem
-Dialogue: 0,0:26:01.65,0:26:12.00,Default,,0,0,0,,{\p1\pos(943,20)\an7\bord0\shad0\1c&HFFFFFF&\1a&H4F&}m 18 0 l 959 0 b 969 0 977 8 977 18 l 977 242 b 977 252 969 260 959 260 l 18 260 b 8 260 0 252 0 242 l 0 18 b 0 8 8 0 18 0{\p0}
-Dialogue: 1,0:26:01.65,0:26:12.00,C,C,0,0,0,,{\q2}Easyjet is being handed off the North\NUpper Sector of the Lisboa ACC since\Nthey are at FL380 and that sector does\NFL365 to UNL
+Dialogue: 0,0:26:01.80,0:26:12.30,Default,,0,0,0,,{\p1\pos(973,20)\an7\bord0\shad0\1c&HFFFFFF&\1a&H4F&}m 18 0 l 929 0 b 939 0 947 8 947 18 l 947 242 b 947 252 939 260 929 260 l 18 260 b 8 260 0 252 0 242 l 0 18 b 0 8 8 0 18 0{\p0}
+Dialogue: 1,0:26:01.80,0:26:12.30,C,C,0,0,0,,{\q2}Easyjet is being handed off to the\NNorth Upper Sector of the Lisboa ACC\Nsince they are at FL380 and that\Nsector does FL365 to UNL
 Dialogue: 0,0:26:06.00,0:26:09.80,EZS,EZS54LR,0,0,0,,{\q2}134.855, obrigado, EZS54LR
 Dialogue: 0,0:26:37.00,0:26:46.95,Default,,0,0,0,,{\p1\pos(958,20)\an7\bord0\shad0\1c&HFFFFFF&\1a&H4F&}m 18 0 l 944 0 b 954 0 962 8 962 18 l 962 303 b 962 313 954 321 944 321 l 18 321 b 8 321 0 313 0 303 l 0 18 b 0 8 8 0 18 0{\p0}
 Dialogue: 1,0:26:37.00,0:26:46.95,C,C,0,0,0,,{\q2}In the simulation we make sure the plane\Nis going to MAZUK now that it is almost\Nat NATID, but this doesn't require\Ncommunication since in reality the pilots\Nwould just follow the arrival as cleared
@@ -112,9 +127,19 @@ Dialogue: 0,0:30:25.00,0:30:30.70,APP,Lisboa Approach,0,0,0,,{\q2}DLH97V, procee
 Dialogue: 0,0:30:30.70,0:30:36.05,LH,DLH97V,0,0,0,,{\q2}Direct PESEX, descend 4000 feet,\NQNH 1020, DLH97V
 Dialogue: 0,0:30:36.05,0:30:41.75,APP,Lisboa Approach,0,0,0,,{\q2}TAP43RY, contact Lisboa Tower\N118.105, tchau
 Dialogue: 0,0:30:41.75,0:30:46.45,TPY,TAP43RY,0,0,0,,{\q2}118.105, tchau, TAP43RY
-Dialogue: 0,0:30:46.45,0:30:51.25,TWR,Lisboa Tower,0,0,0,,{\q2}the whole tower and ground exchange for\NTAP43RY
+Dialogue: 0,0:30:46.45,0:30:51.90,TPY,TAP43RY,0,0,0,,{\q2}Lisbon Tower, boa tarde, TAP43RY, on\Nfinal for runway 02
+Dialogue: 0,0:30:51.90,0:31:04.10,TWR,Lisboa Tower,0,0,0,,{\q2}TAP43RY, boa tarde, identified, wind\N030 degrees, 4 knots, runway 02\Ncleared to land. Vacate via H4 if able.\NContact ground on 118.105 after arrival
+Dialogue: 0,0:31:04.10,0:31:13.70,TPY,TAP43RY,0,0,0,,{\q2}Runway 02 cleared to land, vacate via\NH4 if able. Contact ground on 118.105\Nafter arrival, obrigado, TAP43RY
 Dialogue: 0,0:33:50.00,0:33:53.80,APP,Lisboa Approach,0,0,0,,{\q2}DLH97V, cleared ILS approach runway\N02
 Dialogue: 0,0:33:53.80,0:33:57.65,LH,DLH97V,0,0,0,,{\q2}Cleared ILS approach runway 02,\NDLH97V
+Dialogue: 0,0:34:12.00,0:34:19.60,TPY,TAP43RY,0,0,0,,{\q2}Lisbon Ground, boa tarde, TAP43RY,\Nvacated runway 02 on H4, request taxi\Nto stand 124
+Dialogue: 0,0:34:19.60,0:34:25.95,GND,Lisboa Ground,0,0,0,,{\q2}TAP43RY, boa tarde, identified, taxi to\Nstand 124 via U4, A
+Dialogue: 0,0:34:25.95,0:34:31.65,TPY,TAP43RY,0,0,0,,{\q2}Taxi to stand 124 via U4, A, obrigado,\NTAP43RY
 Dialogue: 0,0:35:43.00,0:35:47.45,APP,Lisboa Approach,0,0,0,,{\q2}DLH97V, contact Lisboa Tower 118.105,\Ntchau
 Dialogue: 0,0:35:47.45,0:35:51.00,LH,DLH97V,0,0,0,,{\q2}118.105, goodbye, DLH97V
-Dialogue: 0,0:35:51.00,0:35:54.55,TWR,Lisboa Tower,0,0,0,,{\q2}the whole tower and ground exchange for\NDLH97V
+Dialogue: 0,0:35:51.00,0:35:55.35,LH,DLH97V,0,0,0,,{\q2}Lisbon Tower, good evening, DLH97V, on\Nfinal for runway 02
+Dialogue: 0,0:35:55.35,0:36:06.45,TWR,Lisboa Tower,0,0,0,,{\q2}DLH97V, good evening, identified, wind\N030 degrees, 4 knots, runway 02\Ncleared to land. Vacate via H4 if able.\NContact ground on 118.105 after arrival
+Dialogue: 0,0:36:06.45,0:36:14.70,LH,DLH97V,0,0,0,,{\q2}Runway 02 cleared to land, vacate via\NH4 if able. Contact ground on 118.105\Nafter arrival, thanks, DLH97V
+Dialogue: 0,0:36:30.00,0:36:36.50,LH,DLH97V,0,0,0,,{\q2}Lisbon Ground, good evening, DLH97V,\Nvacated runway 02 on H4, request taxi\Nto stand 115
+Dialogue: 0,0:36:36.50,0:36:41.75,GND,Lisboa Ground,0,0,0,,{\q2}DLH97V, good evening, identified, taxi\Nto stand 115 via U4, A
+Dialogue: 0,0:36:41.75,0:36:46.10,LH,DLH97V,0,0,0,,{\q2}Taxi to stand 115 via U4, A, thanks,\NDLH97V
