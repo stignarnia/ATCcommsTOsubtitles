@@ -56,6 +56,7 @@ def apply_visual_substitutions(
     speakers: dict[str, dict[str, str]],
     types: dict[str, dict[str, str]],
     meta: dict[str, dict[str, str]],
+    speaker_keys_with_name_prefix: set[str] | None = None,
 ) -> list[tuple[str, str]]:
     """
     Apply all visual substitutions to the comms lines, exactly once.
@@ -67,6 +68,8 @@ def apply_visual_substitutions(
     Future substitutions should be added here without touching generate_ass().
     """
     speaker_id_to_name = build_speaker_display_name_map(speakers, types, meta)
+    speaker_keys = set(speakers.keys())
+    speaker_keys_with_name_prefix = speaker_keys_with_name_prefix or set()
 
     prepared: list[tuple[str, str]] = []
     for idx, (k, v) in enumerate(comms_lines):
@@ -75,7 +78,19 @@ def apply_visual_substitutions(
             continue
 
         text = strip_outer_quotes(v)
+
+        # Optional speaker-name prefix rendering (e.g. "JET = ..." -> "N178QS: ...").
+        # Done via the existing substitution pipeline by prepending "<KEY> = " and then:
+        # 1) applying speaker-ID -> display-name substitutions
+        # 2) converting the first "=" to ":" for display
+        if k in speaker_keys_with_name_prefix and k in speaker_keys:
+            text = f"{k} = {text}" if text else f"{k} ="
+
         text = substitute_speaker_ids(text, speaker_id_to_name)
+
+        if k in speaker_keys_with_name_prefix and k in speaker_keys:
+            text = re.sub(r"\s*=\s*", ": ", text, count=1)
+
         prepared.append((k, text))
 
     return prepared

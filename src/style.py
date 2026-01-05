@@ -1,3 +1,5 @@
+from effective_config import get_effective_speaker_str
+
 def get_speaker_style(
     speaker_key: str,
     speakers: dict[str, dict[str, str]],
@@ -13,32 +15,40 @@ def get_speaker_style(
     """
     meta = meta or {}
 
-    def _pick(*values: object, default: str) -> str:
-        """Return the first non-empty string among values, else default."""
-        for v in values:
-            if v is None:
-                continue
-            s = str(v).strip()
-            if s:
-                return s
-        return default
-
-    # Prefer explicit speaker entry if present; else use meta.<KEY> as a "virtual speaker".
-    speaker_info = speakers.get(speaker_key)
-    if not speaker_info and speaker_key in meta:
-        speaker_info = dict(meta[speaker_key])
-
-    speaker_info = speaker_info or {}
-
-    speaker_type = _pick(speaker_info.get("type"), default="")
-    type_info = types.get(speaker_type, {}) if speaker_type else {}
-
     # Position normalization is handled separately so callers can map to ASS alignments.
     return {
-        "display_name": _pick(speaker_info.get("name"), default=speaker_key),
-        "position": _pick(speaker_info.get("position"), type_info.get("position"), default="bottom-left"),
-        "color": _pick(speaker_info.get("color"), type_info.get("color"), default="white"),
-        "background": _pick(speaker_info.get("background"), type_info.get("background"), default="none"),
+        "display_name": get_effective_speaker_str(
+            speaker_key,
+            "name",
+            speakers=speakers,
+            types=types,
+            meta=meta,
+            default=speaker_key,
+        ),
+        "position": get_effective_speaker_str(
+            speaker_key,
+            "position",
+            speakers=speakers,
+            types=types,
+            meta=meta,
+            default="bottom-left",
+        ),
+        "color": get_effective_speaker_str(
+            speaker_key,
+            "color",
+            speakers=speakers,
+            types=types,
+            meta=meta,
+            default="white",
+        ),
+        "background": get_effective_speaker_str(
+            speaker_key,
+            "background",
+            speakers=speakers,
+            types=types,
+            meta=meta,
+            default="none",
+        ),
     }
 
 def _normalize_position(pos: str | None) -> str:

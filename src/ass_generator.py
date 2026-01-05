@@ -9,6 +9,7 @@ from ini_parsing import (
     parse_comms_lines,
     parse_ini_non_comms,
 )
+from effective_config import get_effective_speaker_bool
 from speech_estimation import estimate_duration
 from style import get_speaker_style, position_to_alignment
 from timestamp import parse_timestamp_to_timedelta
@@ -64,6 +65,22 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
     speakers = {
         s.split(".")[-1]: dict(config.items(s)) for s in config.sections() if s.startswith("speakers.")
     }
+
+    # Speaker name prefix option (centralized precedence resolution):
+    # 1) [speakers.<KEY>].show_name
+    # 2) [speakerTypes.<Type>].show_name
+    # 3) default false
+    speaker_keys_with_name_prefix: set[str] = set()
+    for sk in speakers.keys():
+        if get_effective_speaker_bool(
+            sk,
+            "show_name",
+            speakers=speakers,
+            types=types,
+            meta=None,
+            default=False,
+        ):
+            speaker_keys_with_name_prefix.add(sk)
 
     # Meta mappings (short tags used in [comms], e.g. [meta.T] or [meta.C])
     meta = {s.split(".")[-1]: dict(config.items(s)) for s in config.sections() if s.startswith("meta.")}
@@ -308,6 +325,7 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
         speakers=speakers,
         types=types,
         meta=meta,
+        speaker_keys_with_name_prefix=speaker_keys_with_name_prefix,
     )
 
     # Helper: find the next marker time after a given index

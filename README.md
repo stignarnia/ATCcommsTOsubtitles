@@ -54,6 +54,11 @@ Commands
 
 - `[speakerTypes.<Name>]`
   - Default visual properties for speakers of the given type (`position`, `color`, `background`).
+  - `show_name` (`true`/`false`, default: `false`):
+    - If enabled, speaker lines of this type are rendered as `<speaker display name>: <text>`.
+    - Example (with `show_name = true` on the `Pilot` type):
+      - Input `[comms]`: `JET = Lisboa Arrival good evening, JET, FL250, inbound to LAZET, Information K`
+      - Output subtitle: `N178QS: Lisboa Arrival good evening, N178QS, FL250, inbound to LAZET, Information K`
 
 - `[meta.<Key>]`
   - Can be used in two ways:
@@ -69,7 +74,7 @@ Commands
     Assuming a `Comment` meta type is declared earlier, can be used to give a shorthand key and to override `position`, `color` and `background`. All meta types that aren't `Timestamp` fall into this category.
 
 - `[speakers.<KEY>]`
-  - Speaker definitions keyed by stable identifier (used as `ASS` style name). Fields: `name`, `type`, `color` (hex or named color), `background` (`none` or a color).
+  - Speaker definitions keyed by stable identifier (used as `ASS` style name). Fields: `name`, `type`, `color` (hex or named color), `background` (`none` or a color), `show_name` (`true`/`false`, default: `false`).
 
 - `[acronyms.<KEY>]`
   - `extension = ...` used to expand acronyms (e.g. FL -> "Flight Level").

@@ -26,6 +26,9 @@ background = none
 position = bottom-left
 color = white
 background = none
+; If true, speaker lines are rendered as "<speaker display name>: <text>".
+; Example: "JET = hello" -> "N178QS: hello"
+show_name = false
 
 [speakerTypes.Pilot]
 position = bottom-right
