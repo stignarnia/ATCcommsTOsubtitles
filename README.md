@@ -15,11 +15,11 @@ Prerequisites
 Quick start
 - Initialize the example INI:
 ```bash
-uv run main.py init --name comms.ini
+uv run src/main.py init --name comms.ini
 ```
 - Compile an INI to ASS:
 ```bash
-uv run main.py compile -i comms.ini -o comms.ass
+uv run src/main.py compile -i comms.ini -o comms.ass
 ```
 
 Commands
