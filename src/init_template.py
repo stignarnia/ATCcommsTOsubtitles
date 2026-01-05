@@ -6,7 +6,15 @@ def init_template(name: str = "comms.ini") -> None:
         print(f"File already exists: {name}")
         return
 
-    sample = """; Meta types
+    sample = """; Global rendering (applies to the whole ASS script)
+[render]
+; Script resolution (ASS PlayResX/PlayResY). Keep these consistent with your target video resolution.
+play_res_x = 1920
+play_res_y = 1080
+; Deterministic wrap width target as a ratio of usable width (after margins). Example: 0.75 = 3/4.
+wrap_width_ratio = 0.75
+
+; Meta types
 [metaTypes.Timestamp]
 ; Every combination of hours, minutes, seconds and milliseconds is supported for *input parsing*.
 ; Important: ASS/SSA event timestamps are centiseconds (H:MM:SS.cc), not milliseconds. If an ASS file

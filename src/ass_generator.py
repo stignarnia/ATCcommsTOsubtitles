@@ -25,6 +25,14 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
     config = parse_ini_non_comms(lines=ini_lines)
     comms_lines = parse_comms_lines(lines=ini_lines)
 
+    # Global rendering options (from INI).
+    # These affect script resolution and deterministic text wrapping width.
+    render_section = "render"
+    play_res_x = int(config.get(render_section, "play_res_x", fallback="1920"))
+    play_res_y = int(config.get(render_section, "play_res_y", fallback="1080"))
+    wrap_width_ratio = float(config.get(render_section, "wrap_width_ratio", fallback="0.75"))
+    wrap_width_ratio = min(1.0, max(0.10, wrap_width_ratio))
+
     ass_file: list[str] = []
 
     # [Script Info]
@@ -32,8 +40,8 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
     ass_file.append("Title: Comms Subtitles")
     ass_file.append("ScriptType: v4.00+")
     ass_file.append("WrapStyle: 2")
-    ass_file.append("PlayResX: 1920")
-    ass_file.append("PlayResY: 1080")
+    ass_file.append(f"PlayResX: {play_res_x}")
+    ass_file.append(f"PlayResY: {play_res_y}")
     ass_file.append("")
 
     # [V4+ Styles]
@@ -111,8 +119,6 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
     # This avoids relying on BorderStyle=3 behavior which varies between renderers.
     #
     # Important: ASS doesn't expose text-measurement, so rectangle width is an approximation.
-    play_res_x = 1920
-    play_res_y = 1080
     font_size = 56
     margin_l = 20
     margin_r = 20
@@ -133,9 +139,7 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
     bg_corner_r = 18  # rounded corner radius (px) for background boxes
 
     # Deterministic wrapping target.
-    # Aim for ~3/4 the screen width so lines fill more of the frame before wrapping.
     usable_px = max(1, play_res_x - margin_l - margin_r)
-    wrap_width_ratio = 0.75
     target_wrap_px = max(1, int(usable_px * wrap_width_ratio))
     max_units_per_line = target_wrap_px / max(1, font_size)
 

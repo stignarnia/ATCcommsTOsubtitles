@@ -101,7 +101,7 @@ Wrapping rules (summary)
 - The compiler wraps text itself (rather than relying on the subtitle renderer):
   - It inserts explicit ASS line breaks (`\N`).
   - It prepends `{\q2}` to each event so the renderer does not re-wrap lines.
-- Wrapping is intentionally aggressive: it targets roughly half the usable screen width to produce taller, more readable blocks and predictable background box sizing.
+- Wrapping is configurable via a `[render]` INI section (play_res_x, play_res_y, wrap_width_ratio). Default `wrap_width_ratio` = 0.75 (≈3/4 usable width) which controls the deterministic wrap target used by the compiler.
 
 Color handling
 - Supports:
