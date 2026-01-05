@@ -494,10 +494,21 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
             speaker_ms = [max(1, int(d.total_seconds() * 1000)) for d in speaker_est]
 
         # Meta rail durations (reuse the block's Timestamp CPS, per requirement)
-        meta_est = [
-            estimate_duration(mval, cps=block_cps, acronyms=acronyms, waypoints=literal_waypoints)
-            for _, mval in meta_msgs
-        ]
+        # For Comment metas (visual-only/read), do NOT perform speech expansions — estimate
+        # duration from the visible text length using CPS. This keeps visual substitutions
+        # for display while avoiding spoken expansions that affect CPS.
+        meta_est: list[timedelta] = []
+        for mkey, mval in meta_msgs:
+            mtype = (meta.get(mkey, {}).get("type") or "").strip().lower()
+            if mtype == "comment":
+                # Use the prepared visual text (mval) but do not run it through speech expansion.
+                text = mval or ""
+                seconds = len(text) / max(0.001, block_cps)
+                meta_est.append(timedelta(milliseconds=int(seconds * 1000)))
+            else:
+                meta_est.append(
+                    estimate_duration(mval, cps=block_cps, acronyms=acronyms, waypoints=literal_waypoints)
+                )
         if is_bounded:
             meta_ms = _scale_durations_to_fit(meta_est, max_ms)
         else:
