@@ -87,26 +87,41 @@ def get_speaker_style(
     types: dict[str, dict[str, str]],
     meta: dict[str, dict[str, str]] | None = None,
 ) -> dict[str, str]:
-    """Get effective style attributes for a speaker (type defaults + speaker overrides).
-    Supports "meta" mappings (e.g. C -> Comment) for non-speaker keys declared under [meta.*]."""
+    """Get effective style attributes for a speaker/meta key.
+
+    Precedence (highest to lowest):
+    1) Per-key overrides under [speakers.<KEY>] or [meta.<KEY>]
+    2) Type defaults under [speakerTypes.<Type>] or [metaTypes.<Type>]
+    3) Hard-coded defaults
+    """
     meta = meta or {}
-    # Prefer explicit speaker entry if present
+
+    def _pick(*values: object, default: str) -> str:
+        """Return the first non-empty string among values, else default."""
+        for v in values:
+            if v is None:
+                continue
+            s = str(v).strip()
+            if s:
+                return s
+        return default
+
+    # Prefer explicit speaker entry if present; else use meta.<KEY> as a "virtual speaker".
     speaker_info = speakers.get(speaker_key)
     if not speaker_info and speaker_key in meta:
-        # Synthesize minimal speaker_info from meta mapping (meta.* sections may only declare type/name).
-        m = meta[speaker_key]
-        speaker_info = {"name": m.get("name", speaker_key), "type": m.get("type")}
+        speaker_info = dict(meta[speaker_key])
 
     speaker_info = speaker_info or {}
-    speaker_type = speaker_info.get("type")
-    type_info = types.get(speaker_type, {})
+
+    speaker_type = _pick(speaker_info.get("type"), default="")
+    type_info = types.get(speaker_type, {}) if speaker_type else {}
 
     # Position normalization is handled separately so callers can map to ASS alignments.
     return {
-        "display_name": speaker_info.get("name", speaker_key),
-        "position": type_info.get("position", "bottom-left"),
-        "color": speaker_info.get("color", type_info.get("color", "white")),
-        "background": speaker_info.get("background", type_info.get("background", "none")),
+        "display_name": _pick(speaker_info.get("name"), default=speaker_key),
+        "position": _pick(speaker_info.get("position"), type_info.get("position"), default="bottom-left"),
+        "color": _pick(speaker_info.get("color"), type_info.get("color"), default="white"),
+        "background": _pick(speaker_info.get("background"), type_info.get("background"), default="none"),
     }
 
 def _normalize_position(pos: str | None) -> str:
