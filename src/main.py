@@ -1,6 +1,7 @@
 import argparse
 
-from ass_generator import generate_ass, init_template
+from ass_generator import generate_ass
+from init_template import init_template
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Compile comms INI to ASS or initialize a template INI.")
