@@ -30,7 +30,7 @@ uv run src/main.py compile -i comms.ini -o comms.ass
   ```
   - Burn them into your video file and cut the initial and final segments with no subtitles (example for PowerShell, i.e. the Windows terminal):
   ```powershell
-  $d = Get-Content "comms.ass" | Select-String "Dialogue:"; $start = ($d[0].ToString() -split ",")[1]; $end = ($d[-1].ToString() -split ",")[2]; ffmpeg -ss $start -to $end -i input.mp4 -vf "subtitles='comms.ass'" -c:a copy output.mp4
+  $d = Get-Content "comms.ass" | Select-String "Dialogue:"; $start = ($d[0].ToString() -split ",")[1]; $end = ($d[-1].ToString() -split ",")[2]; ffmpeg -i input.mp4 -ss $start -to $end -vf "subtitles='comms.ass'" -c:a copy output.mp4
   ```
 
 Commands
