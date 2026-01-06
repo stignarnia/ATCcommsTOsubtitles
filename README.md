@@ -2,18 +2,19 @@
 
 Small command-line tool to compile an INI-style transcript of air traffic communications into ASS subtitle files suitable for video overlay.
 
-Highlights
+## Highlights
 - Keeps `[comms]` entries in order and supports repeated keys (multiple messages per speaker).
 - Estimates spoken durations using configurable characters-per-second, NATO alphabet expansion, acronym expansions and waypoint exceptions.
 - Generates `ASS` styles per speaker and additional elements on screen; supports simple color names and hex colors.
 - Deterministic wrapping: the compiler inserts explicit `\N` line breaks and emits `{\q2}` (no renderer auto-wrap) so line counts are known and consistent across players.
-- Speaker IDs mentioned inside message text are substituted with that speaker’s display name before timing + rendering (see `src/visual_substitution.py`).
+- Speaker IDs mentioned inside message text are substituted with that speaker’s display name before timing + rendering.
 - Includes an `init` command to scaffold a working example `INI`.
 
-Prerequisites
-- `uv` (recommended)
+## Prerequisites
+- `uv` (recommended for running Python)
+- `ffmpeg` or VLC to actually use the output
 
-Quick start
+## Quick start
 - Initialize the example INI:
 ```powershell
 uv run src/main.py init --name comms.ini
@@ -23,21 +24,25 @@ uv run src/main.py init --name comms.ini
 uv run src/main.py compile -i comms.ini -o comms.ass
 ```
 - Use the output file:
-  - Add the file as a subittle source to your player. Only tested on VLC for Windows, players are usually very inconsistent in rendering these.
+  - Add the file as a subtitle source to your player. Only tested on VLC for Windows, players are usually very inconsistent in rendering these.
   - Burn them into your video file:
   ```powershell
-  ffmpeg -i input.mp4 -vf "subtitles=comms.ass" -c:a copy output.mp4
+  uv run src/main.py burn --mode default -i comms.ini -v input.mp4 -o output
   ```
-  - Burn them into your video file and cut the initial and final segments with no subtitles (example for PowerShell, i.e. the Windows terminal):
+  - Burn them into your video file and cut the initial and final segments with no subtitles:
   ```powershell
-  $d = Get-Content "comms.ass" | Select-String "Dialogue:"; $start = ($d[0].ToString() -split ",")[1]; $end = ($d[-1].ToString() -split ",")[2]; ffmpeg -i input.mp4 -ss $start -to $end -vf "subtitles='comms.ass'" -c:a copy output.mp4
+  uv run src/main.py burn --mode trim -i comms.ini -v input.mp4 -o output
+  ```
+  - Burn them into a transparent video that you can import in your video editing software and still be able to put effects and graphics between the video and the text:
+  ```powershell
+  uv run src/main.py burn --mode transparent -i comms.ini -o output
   ```
 
-Commands
+## Commands
 - `compile` (default): read an `INI` and write an `ASS` file.
 - `init`: write a starter `INI` template (does not overwrite existing files unless removed).
 
-`INI` structure
+## `INI` structure
 - `[metaTypes.<Name>]`
   - Define reusable "type" settings for meta entries (for example `Timestamp` or `Comment`).
   - Common keys:
@@ -98,7 +103,7 @@ Commands
   - First `[comms]` entry must be `T=...`.
   - Values may be wrapped in single or double quotes to allow internal apostrophes/quotes. These will be stripped in the final subtitles.
 
-Timing rules (summary)
+## Timing rules
 - Within a `T` block, available time (until next `T`) is allocated across messages.
 - If no following `T` exists, estimated durations (or a small fallback) are used.
 - Estimation rules:
@@ -107,18 +112,18 @@ Timing rules (summary)
   - Digits are counted as spoken words (e.g. "2" → "two").
   - `cps` (characters-per-second) from the timestamp meta type controls conversion to duration.
 
-Wrapping rules (summary)
+## Wrapping rules
 - The compiler wraps text itself (rather than relying on the subtitle renderer):
   - It inserts explicit ASS line breaks (`\N`).
   - It prepends `{\q2}` to each event so the renderer does not re-wrap lines.
 - Wrapping is configurable via a `[render]` INI section (play_res_x, play_res_y, wrap_width_ratio). Default `wrap_width_ratio` = 0.75 (≈3/4 usable width) which controls the deterministic wrap target used by the compiler.
 
-Color handling
+## Color handling
 - Supports:
   - `#RRGGBB`
   - `#RRGGBBAA` (alpha ignored for text, preserved for background boxes)
   - Named colors via the `webcolors` package
 - Converted into ASS color format (`&H00BBGGRR`).
 
-Notes
+## Notes
 - When placing apostrophes in values, wrap the value in double quotes to avoid parsing issues (e.g. "don't").

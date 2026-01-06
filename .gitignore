@@ -8,3 +8,8 @@ wheels/
 
 # Virtual environments
 .venv
+
+.vscode
+
+*.webm
+*.mp4

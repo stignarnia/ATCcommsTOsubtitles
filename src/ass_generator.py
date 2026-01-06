@@ -16,7 +16,7 @@ from style import get_speaker_style, position_to_alignment
 from timestamp import parse_timestamp_to_timedelta
 from visual_substitution import apply_visual_substitutions
 
-def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") -> None:
+def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") -> dict:
     # Read INI into memory once
     with open(input_path, "r", encoding="utf-8") as _f:
         ini_lines = _f.readlines()
@@ -205,6 +205,10 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
 
     pending_events: list[tuple[timedelta, int, str]] = []
 
+    # track earliest start and latest end for metadata
+    earliest_start = None
+    latest_end = None
+
     i = 0
     while i < len(comms_lines_prepared):
         if i not in markers_by_index:
@@ -269,6 +273,12 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
                 milliseconds=dur_ms if dur_ms > 0 else int(fallback_duration.total_seconds() * 1000)
             )
 
+            # update metadata tracking
+            if earliest_start is None or start_time < earliest_start:
+                earliest_start = start_time
+            if latest_end is None or end_time > latest_end:
+                latest_end = end_time
+
             text_val = mval
             wrapped_text, line_count, max_units = wrap_ass_text(text_val, max_units_per_line)
 
@@ -301,6 +311,12 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
             end_time = start_time + timedelta(
                 milliseconds=dur_ms if dur_ms > 0 else int(fallback_duration.total_seconds() * 1000)
             )
+
+            # update metadata tracking
+            if earliest_start is None or start_time < earliest_start:
+                earliest_start = start_time
+            if latest_end is None or end_time > latest_end:
+                latest_end = end_time
 
             text_val = mval
             wrapped_text, line_count, max_units = wrap_ass_text(text_val, max_units_per_line)
@@ -337,5 +353,14 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
     if out_dir and not os.path.exists(out_dir):
         os.makedirs(out_dir, exist_ok=True)
 
+    ass_text = "\n".join(ass_file)
     with open(output_path, "w", encoding="utf-8") as f:
-        f.write("\n".join(ass_file))
+        f.write(ass_text)
+
+    metadata = {
+        "start_seconds": earliest_start.total_seconds() if earliest_start is not None else None,
+        "end_seconds": latest_end.total_seconds() if latest_end is not None else None,
+        "playres": (play_res_x, play_res_y),
+    }
+
+    return metadata
