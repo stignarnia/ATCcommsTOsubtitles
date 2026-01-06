@@ -25,6 +25,7 @@ def main() -> None:
     bp.add_argument("-i", "--input", default="../comms.ini", help="Input INI file (used to generate ASS)")
     bp.add_argument("-v", "--video", help="Input video file (required for default and trim modes)")
     bp.add_argument("-o", "--output", default="../output", help="Output file path with no extension")
+    bp.add_argument("--progress", default="true", choices=["true", "false"], help="Show progress bar (true/false). Use 'false' to keep ffmpeg output.")
 
     args = parser.parse_args()
 
@@ -34,7 +35,8 @@ def main() -> None:
         ini_path = Path(args.input)
         video_path = Path(args.video) if args.video else None
         out_path = Path(args.output)
-        burn_from_ini(args.mode, ini_path, video_path, out_path)
+        progress = True if args.progress.lower() == "true" else False
+        burn_from_ini(args.mode, ini_path, video_path, out_path, progress)
     else:
         # compile (default)
         generate_ass(args.input, args.output)
