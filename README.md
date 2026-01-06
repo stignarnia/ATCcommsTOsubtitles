@@ -15,13 +15,23 @@ Prerequisites
 
 Quick start
 - Initialize the example INI:
-```bash
+```powershell
 uv run src/main.py init --name comms.ini
 ```
 - Compile an INI to ASS:
-```bash
+```powershell
 uv run src/main.py compile -i comms.ini -o comms.ass
 ```
+- Use the output file:
+  - Add the file as a subittle source to your player. Only tested on VLC for Windows, players are usually very inconsistent in rendering these.
+  - Burn them into your video file:
+  ```powershell
+  ffmpeg -i input.mp4 -vf "subtitles=comms.ass" -c:a copy output.mp4
+  ```
+  - Burn them into your video file and cut the initial and final segments with no subtitles (example for PowerShell, i.e. the Windows terminal):
+  ```powershell
+  $d = Get-Content "comms.ass" | Select-String "Dialogue:"; $start = ($d[0].ToString() -split ",")[1]; $end = ($d[-1].ToString() -split ",")[2]; ffmpeg -ss $start -to $end -i input.mp4 -vf "subtitles='comms.ass'" -c:a copy output.mp4
+  ```
 
 Commands
 - `compile` (default): read an `INI` and write an `ASS` file.

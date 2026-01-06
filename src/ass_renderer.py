@@ -8,7 +8,7 @@ MARGIN_L = 20
 MARGIN_R = 20
 MARGIN_V = 20
 BG_LINE_H = int(FONT_SIZE * 1.10)
-BG_PAD_Y = 8
+BG_PAD_Y = 15
 BG_PAD_X = 20
 WIDTH_SCALE = 1
 BG_CORNER_R = 18
@@ -78,10 +78,10 @@ def get_text_core_width_px(max_units: float) -> int:
 def get_bg_y_top(alignment: int, height: int, play_res_y: int) -> int:
     # 7,8,9=top; 4,5,6=middle; 1,2,3=bottom
     if alignment in (7, 8, 9):
-        return MARGIN_V
+        return MARGIN_V - BG_PAD_Y
     if alignment in (4, 5, 6):
         return (play_res_y // 2) - (height // 2)
-    return play_res_y - MARGIN_V - height
+    return play_res_y - MARGIN_V + BG_PAD_Y - height
 
 def get_bg_box_x(alignment: int, text_w: int, play_res_x: int) -> tuple[int, int]:
     # 1,4,7=left; 2,5,8=center; 3,6,9=right
