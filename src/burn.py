@@ -146,7 +146,7 @@ def _run_ffmpeg_with_progress(cmd, total_frames, progress=True):
         elapsed = time.time() - start_time
         left = _format_time(elapsed)
         final_bar = "█" * bar_len
-        sys.stdout.write(f"\r[{final_bar}] {100.00:6.2f}%  {total_frames}/{total_frames}  { (total_frames/elapsed) if elapsed>0 else 0.0:5.1f } fps  elapsed {left}  eta 0:00:00\n")
+        sys.stdout.write(f"\r[{final_bar}] {100.00:6.2f}%  {total_frames}/{total_frames}  { (total_frames/elapsed) if elapsed>0 else 0.0:5.1f} fps  elapsed {left}  eta 0:00:00\n")
         sys.stdout.flush()
         if proc.returncode != 0:
             print("ffmpeg failed with exit code", proc.returncode, file=sys.stderr)
