@@ -91,3 +91,34 @@ def get_effective_speaker_bool(
     speaker_info = _speaker_info_for_key(speaker_key, speakers, meta)
     type_info = _type_info_for_speaker_info(speaker_info, types)
     return pick_bool(speaker_info.get(attr), type_info.get(attr), default=default)
+
+def pick_int(*values: object, default: int) -> int:
+    """Return the first parseable int among values, else default."""
+    for v in values:
+        if v is None:
+            continue
+        try:
+            return int(str(v).strip())
+        except ValueError:
+            continue
+    return default
+
+def get_effective_speaker_int(
+    speaker_key: str,
+    attr: str,
+    *,
+    speakers: Mapping[str, Mapping[str, str]],
+    types: Mapping[str, Mapping[str, str]],
+    meta: Mapping[str, Mapping[str, str]] | None = None,
+    default: int = 0,
+) -> int:
+    """
+    Resolve a speaker/meta integer attribute with standard precedence:
+
+    1) [speakers.<KEY>].<attr> or [meta.<KEY>].<attr>
+    2) [speakerTypes.<Type>].<attr> or [metaTypes.<Type>].<attr>
+    3) default
+    """
+    speaker_info = _speaker_info_for_key(speaker_key, speakers, meta)
+    type_info = _type_info_for_speaker_info(speaker_info, types)
+    return pick_int(speaker_info.get(attr), type_info.get(attr), default=default)

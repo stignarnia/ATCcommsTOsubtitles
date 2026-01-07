@@ -4,7 +4,7 @@ from datetime import timedelta
 from ass_format import ass_color, escape_ass_text, format_time
 from ass_renderer import create_bg_event, wrap_ass_text, get_max_units_per_line
 from config_validation import ensure_no_timing_keys, ensure_no_visual_keys, is_timestamp_name
-from effective_config import get_effective_speaker_bool
+from effective_config import get_effective_speaker_bool, get_effective_speaker_int
 from ini_parsing import (
     load_acronyms,
     load_waypoints,
@@ -126,6 +126,14 @@ def generate_ass(input_path: str = "comms.ini", output_path: str = "comms.ass") 
             "has_bg": has_bg,
             "bg_ass": bg_ass,
             "alignment": alignment,
+            "background_lines_threshold": get_effective_speaker_int(
+                speaker_key,
+                "background_lines_threshold",
+                speakers=speakers,
+                types=types,
+                meta=meta,
+                default=1,
+            ),
         }
 
         ass_file.append(

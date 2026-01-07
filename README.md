@@ -52,6 +52,7 @@ uv run src/main.py compile -i comms.ini -o comms.ass
     - `position` = visual position used when generating styles (examples: `bottom-right`, `top-left`, `middle-center`). Speaker and meta styles inherit this if not overridden.
     - `color` = color for generated ASS styles (named color or hex `#RRGGBB` / `#RRGGBBAA`; alpha is ignored for text, preserved for background boxes).
     - `background` = background behind subtitles. Accepts `none` or a color (named color / `#RRGGBB` / `#RRGGBBAA`). When set to a color, subtitles render with an opaque-box background.
+    - `background_lines_threshold` = minimum number of text lines required to show the background box (default `1`). Useful to only show background for multi-line blocks.
   - Usage:
     - Mandatory `Timestamp` meta type:
       ```ini
@@ -68,7 +69,7 @@ uv run src/main.py compile -i comms.ini -o comms.ass
       ```
 
 - `[speakerTypes.<Name>]`
-  - Default visual properties for speakers of the given type (`position`, `color`, `background`).
+  - Default visual properties for speakers of the given type (`position`, `color`, `background`, `background_lines_threshold`).
   - `show_name` (`true`/`false`, default: `false`):
     - If enabled, speaker lines of this type are rendered as `<speaker display name>: <text>`.
     - Example (with `show_name = true` on the `Pilot` type):

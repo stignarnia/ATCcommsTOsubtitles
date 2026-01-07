@@ -144,6 +144,10 @@ def create_bg_event(
     if not sr.get("has_bg"):
         return None
 
+    threshold = int(sr.get("background_lines_threshold", 1))
+    if line_count < threshold:
+        return None
+
     bg_alpha, bg_bbggrr = split_ass_color(str(sr.get("bg_ass", "&H00000000")))
     alignment = int(sr.get("alignment", 1))
 

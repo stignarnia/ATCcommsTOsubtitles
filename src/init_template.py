@@ -28,12 +28,16 @@ cps = 15
 position = top-left
 color = gray
 background = none
+; The following line means the background is always shown, which is the default when background is not none
+background_lines_threshold = 1
 
 ; Speaker types
 [speakerTypes.ATC]
 position = bottom-left
 color = white
 background = none
+; The following line means the background is shown only when the text has at least 2 lines
+background_lines_threshold = 2
 ; If true, speaker lines are rendered as "<speaker display name>: <text>".
 ; Example: "JET = hello" -> "N178QS: hello"
 show_name = false
