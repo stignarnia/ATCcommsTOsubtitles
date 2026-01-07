@@ -29,6 +29,14 @@ def main() -> None:
 
     args = parser.parse_args()
 
+    # Ensure compile args exist when compile is the selected/default command
+    # (argparse doesn't attach subparser args when no subparser is parsed into the namespace).
+    if args.command is None:
+        if not hasattr(args, "input"):
+            args.input = "../comms.ini"
+        if not hasattr(args, "output"):
+            args.output = "../comms.ass"
+
     if args.command == "init":
         init_template(args.name)
     elif args.command == "burn":
